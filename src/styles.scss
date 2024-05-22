@@ -1,5 +1,15 @@
 /* You can add global styles to this file, and also import other style files */
 
 @tailwind base;
+
+@layer base {
+    html,
+    body {
+        font-family: Roboto, "Helvetica Neue", sans-serif;
+        @apply m-0 h-full w-full text-base;
+        background: #f3f4f6;
+    }
+}
+
 @tailwind components;
 @tailwind utilities;
