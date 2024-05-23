@@ -48,7 +48,7 @@ export class UserService {
   }
 
   getUsers(){
-    return this.http.get(this.prefixUrl + '/users');
+    return this.http.get(this.prefixUrl);
   }
 
   getToken(){

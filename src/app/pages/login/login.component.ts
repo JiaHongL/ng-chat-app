@@ -11,6 +11,8 @@ import { UserService } from '../../services/user.service';
 import { RegisterDialogComponent } from './register-dialog/register-dialog.component';
 import { NotificationDialogComponent } from '../../shared/components/notification-dialog/notification-dialog.component';
 
+import { Observable, forkJoin, switchMap } from 'rxjs';
+
 @Component({
   selector: 'app-login',
   standalone: true,
@@ -78,8 +80,18 @@ export class LoginComponent {
     };
     this.userService
       .login(data)
+      .pipe(
+        switchMap(res => {
+          return forkJoin([     
+            this.userService.getUserInfo(),
+            this.userService.getUsers()
+          ]);
+        })
+      )
       .subscribe({
-        next: () => {
+        next: ([userInfo, users]) => {
+          console.log('userInfo:', userInfo);
+          console.log('users:', users);
           this.router.navigate(['/chat']);
         },
         error: () => {
