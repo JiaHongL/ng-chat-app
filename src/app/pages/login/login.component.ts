@@ -2,11 +2,23 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 
+import { FormsModule } from '@angular/forms';
+
+import { Dialog } from '@angular/cdk/dialog';
+
+import { UserService } from '../../services/user.service';
+
+import { RegisterDialogComponent } from './register-dialog/register-dialog.component';
+import { NotificationDialogComponent } from '../../shared/components/notification-dialog/notification-dialog.component';
+
 @Component({
   selector: 'app-login',
   standalone: true,
   imports: [
     CommonModule,
+    FormsModule,
+    RegisterDialogComponent,
+    NotificationDialogComponent
   ],
   template: `
   <!-- Login page -->
@@ -21,60 +33,61 @@ import { Router } from '@angular/router';
         </div>
       </div>
       <h2 class="text-3xl font-bold text-gray-900 text-center mb-4">Chat!</h2>
-      <p class="text-gray-500 text-center mb-6">Don't have an account yet? <a class="text-blue-500" (click)="isShowModal.set(true)">Sign up</a></p>
-      <form>
+      <p class="text-gray-500 text-center mb-6">Don't have an account yet? <a class="text-blue-500 cursor-pointer" (click)="openRegisterDialog()">Sign up</a></p>
+      <form #loginForm="ngForm">
         <div class="mb-4">
-          <label class="block text-gray-700 mb-1" for="email">Name</label>
-          <input type="email" id="email" class="w-full p-3 rounded-lg bg-gray-100 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="User Name">
+          <label class="block text-gray-700 mb-1" for="username">Name</label>
+          <input required [(ngModel)]="username" name="username" type="text" id="username" class="w-full p-3 rounded-lg bg-gray-100 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="User Name">
         </div>
         <div class="mb-6">
           <label class="block text-gray-700 mb-1" for="password">Password</label>
-          <input type="password" id="password" class="w-full p-3 rounded-lg bg-gray-100 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Password">
+          <input required [(ngModel)]="password" name="password" type="password" id="password" class="w-full p-3 rounded-lg bg-gray-100 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Password">
         </div>
-        <button type="submit" class="w-full py-3 rounded-lg bg-blue-500 text-white font-semibold hover:bg-blue-600 transition duration-200" (click)="login()">Login</button>
+        <div class="flex justify-center">
+          <button 
+            type="button"
+            class="py-2 px-4 bg-blue-500 text-white rounded-lg disabled:opacity-50 hover:bg-blue-600 hover:transition hover:duration-200" 
+            [disabled]="loginForm.invalid"
+            (click)="login()"
+          >Login</button>
+        </div>
       </form>
     </div>
   </div>
-
-  <!-- Overlay -->
-  @if(isShowModal()){
-    <div class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center">
-      <!-- Registration Modal -->
-      <div class="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
-        <div class="flex justify-between items-center mb-6">
-          <h2 class="text-2xl font-bold text-gray-900">Register</h2>
-          <button class="text-gray-400 hover:text-gray-600" (click)="isShowModal.set(false)">
-            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
-            </svg>
-          </button>
-        </div>
-        <form>
-          <div class="mb-4">
-            <label class="block text-gray-700 mb-1" for="username">Name</label>
-            <input type="text" id="username" class="w-full p-3 rounded-lg bg-gray-100 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="User name">
-          </div>
-          <div class="mb-6">
-            <label class="block text-gray-700 mb-1" for="password">Password</label>
-            <input type="password" id="password" class="w-full p-3 rounded-lg bg-gray-100 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Password">
-          </div>
-          <div class="flex justify-end space-x-4">
-            <button type="button" class="py-2 px-4 bg-gray-300 text-gray-900 rounded-lg hover:bg-gray-400 transition duration-200" (click)="isShowModal.set(false)">Cancel</button>
-            <button type="submit" class="py-2 px-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-200" (click)="isShowModal.set(false)">Register</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  }
-
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LoginComponent {
   router = inject(Router);
-  isShowModal = signal(false);
+  userService = inject(UserService);
+  dialog = inject(Dialog);
 
-  login(){
-    this.router.navigate(['/chat']);
+  username = signal<string>('');
+  password = signal<string>('');
+
+  openRegisterDialog() {
+    this.dialog.open(RegisterDialogComponent, {
+      autoFocus: false,
+    });
   }
+
+  login() {
+    const data = {
+      username: this.username(),
+      password: this.password(),
+    };
+    this.userService
+      .login(data)
+      .subscribe({
+        next: () => {
+          this.router.navigate(['/chat']);
+        },
+        error: () => {
+          this.dialog.open(NotificationDialogComponent, {
+            data: { message: '登入失敗!' }
+          });
+        }
+      });
+  }
+
 }

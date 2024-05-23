@@ -1,0 +1,58 @@
+import { Injectable, effect, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
+
+import { environment } from '../../environments/environment';
+
+import { tap } from 'rxjs';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class UserService {
+
+  prefixUrl = environment.apiUrl + '/users';
+
+  private http = inject(HttpClient);
+  private token = signal(window.localStorage.getItem('token') ? window.localStorage.getItem('token') : '');
+  private router = inject(Router);
+
+  saveLocalStorageEffect = effect(() => {
+    const token = this.token() || '';
+    window.localStorage.setItem('token', token);
+  });
+
+  login(data: {
+    username: string,
+    password: string
+  }) {
+    return this.http.post<{token:string}>(this.prefixUrl + '/login', data).pipe(tap((res)=>{
+      this.token.set(res.token);
+    }));
+  }
+
+  logout(){
+    this.token.set('');
+    this.router.navigate(['/login']);
+  }
+
+  register(data: {
+    username: string,
+    password: string
+  }) {
+    return this.http.post(this.prefixUrl + '/register', data);
+  };
+
+  getUserInfo(){
+    return this.http.get(this.prefixUrl + '/me');
+  }
+
+  getUsers(){
+    return this.http.get(this.prefixUrl + '/users');
+  }
+
+  getToken(){
+    return this.token();
+  }
+
+}
