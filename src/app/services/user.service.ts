@@ -66,4 +66,8 @@ export class UserService {
     return this.token();
   }
 
+  isLoggedIn(){
+    return !!this.token();
+  }
+
 }
