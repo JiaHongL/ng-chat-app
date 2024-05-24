@@ -26,7 +26,7 @@ import { ChatStore } from '../../../store/chat.store';
 								alt="Profile Image"
 								/>
 								<div>
-								<div class="font-semibold text-gray-700 max-w-[100px] text-nowrap overflow-hidden text-ellipsis">{{user.username}}</div>
+								<div class="font-semibold text-gray-700 max-w-[70px] text-nowrap overflow-hidden text-ellipsis">{{user.username}}</div>
 								</div>
 						</li>
 					}
@@ -48,7 +48,7 @@ import { ChatStore } from '../../../store/chat.store';
 								alt="Profile Image"
 								/>
 								<div>
-								<div class="font-semibold text-gray-700 max-w-[100px] text-nowrap overflow-hidden text-ellipsis">{{user.username}}</div>
+								<div class="font-semibold text-gray-700 max-w-[70px] text-nowrap overflow-hidden text-ellipsis">{{user.username}}</div>
 								</div>
 						</li>
 					}
@@ -59,6 +59,6 @@ import { ChatStore } from '../../../store/chat.store';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UserStatusListComponent {
-  @HostBinding('class') class = 'min-w-[150px] w-100 bg-gray-100 p-4 flex flex-nowrap flex-col';
+  @HostBinding('class') class = 'mix-w-[200px] min-w-[200px] w-100 bg-gray-100 p-4 flex flex-nowrap flex-col';
   store = inject(ChatStore);
 }
