@@ -22,6 +22,7 @@ export interface UserInfo {
 }
 
 export interface ChatState {
+    isSocketStable: boolean;
     userInfo: UserInfo | null;
     currentRoom: string;
     users: User[];
@@ -31,6 +32,7 @@ export interface ChatState {
 }
 
 export const initialState: ChatState = {
+    isSocketStable: false,
     userInfo: null,
     currentRoom: 'general', // 默認聊天室
     users: [],

@@ -102,6 +102,9 @@ export const ChatStore = signalStore(
         const message = JSON.parse(event.data);
         console.log('=>>>Received message:', message);
         switch (message.event) {
+          case 'initializationComplete': // 是第一次連線成功後的回應(接收完相關初始化資料)
+            patchState(store, { isSocketStable: true });
+            break;
           case 'onlineUsers':
             patchState(store, {
               users: store.users().map(user => {
