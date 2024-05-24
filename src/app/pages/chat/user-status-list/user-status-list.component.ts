@@ -11,7 +11,7 @@ import { ChatStore } from '../../../store/chat.store';
   template: `
 	<div class="overflow-scroll custom-scrollbar">
 		<div class="flex-grow-0">
-				<h3 class="font-semibold text-sm text-green-500">Online</h3>
+				<h3 class="font-semibold text-sm text-green-500">Online - {{ store.onlineUsers().length }}</h3>
 		</div>
 		<div class="flex-0 mb-3">
 				<ul class="overflow-hidden">
@@ -33,7 +33,7 @@ import { ChatStore } from '../../../store/chat.store';
 				</ul>
 		</div>
 		<div class="flex-grow-0">
-				<h3 class="font-semibold text-sm text-gray-500">Offline</h3>
+				<h3 class="font-semibold text-sm text-gray-500">Offline - {{ store.offlineUsers().length }}</h3>
 		</div>
 		<div class="flex-0">
 				<ul class="overflow-hidden">

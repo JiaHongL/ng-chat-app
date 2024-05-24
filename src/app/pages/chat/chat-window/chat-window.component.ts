@@ -23,7 +23,16 @@ import { FormsModule } from '@angular/forms';
 
     </div>
     <div>
-      <div class="font-semibold text-xl text-nowrap overflow-hidden text-ellipsis">{{  store.currentChatPartner()?.username }}</div>
+      <div class="flex items-center font-semibold text-xl text-nowrap overflow-hidden text-ellipsis">
+        <div class="mr-1">
+          {{  store.currentChatPartner()?.username }}
+        </div>
+        @if(store.currentChatPartner()?.username === 'general'){
+          <span class="text-sm text-gray-500">
+            ({{ store.users().length }})
+          </span>
+        }
+      </div>
       <div class="text-gray-500 text-sm">{{  store.currentChatPartner()?.status }}</div>
     </div>
   </div>

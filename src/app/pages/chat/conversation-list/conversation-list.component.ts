@@ -40,7 +40,12 @@ import { SafeHtmlPipe } from '../../../shared/pipes/safe-html.pipe';
 					</div>
 					<div class="flex-grow overflow-hidden">
 							<div>
-									<div class="font-semibold">general</div>
+									<div class="font-semibold">
+										general
+										<span class="text-sm text-gray-500">
+											({{ store.users().length }})
+										</span>
+									</div>
 									<div class="w-4/5 text-gray-500 text-sm whitespace-nowrap overflow-hidden overflow-ellipsis">{{ store.messageNotifications().general.lastMessage.message | appSafeHtml }}</div>
 							</div>
 							<span class="absolute top-2 right-2 text-blue-500 text-sm">{{ store.messageNotifications().general.lastMessage.date | date: 'HH:mm'  }}</span>
@@ -52,7 +57,7 @@ import { SafeHtmlPipe } from '../../../shared/pipes/safe-html.pipe';
 	</div>
 
   <h3 class="font-semibold text-sm text-gray-300 mb-1">Private Message</h3>
-  <ul class="max-h-73 overflow-scroll">
+  <ul class="max-h-73 overflow-scroll custom-scrollbar">
     <!-- Repeat similar list items for other contacts -->
 		@for (user of store.messageNotifications().private; track user.username) {
 			@if(user?.lastMessage){
