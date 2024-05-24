@@ -57,6 +57,6 @@ import { ChatStore } from '../../../store/chat.store';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UserStatusListComponent {
-  @HostBinding('class') class = 'w-1/5 w-100 bg-gray-100 p-4 flex flex-nowrap flex-col';
+  @HostBinding('class') class = 'w-1/5 min-w-fit w-100 bg-gray-100 p-4 flex flex-nowrap flex-col';
   store = inject(ChatStore);
 }
