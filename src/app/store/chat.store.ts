@@ -1,10 +1,11 @@
 // chat.store.ts
-import { inject, computed, effect } from '@angular/core';
+import { inject, computed } from '@angular/core';
 import { signalStore, withState, withMethods, patchState, withComputed } from '@ngrx/signals';
 import { User, ChatState, initialState, UserInfo, PrivateMessage } from './models';
 
 import { UserService } from '../services/user.service';
 import { firstValueFrom } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export const ChatStore = signalStore(
   { providedIn: 'root' },
@@ -93,7 +94,7 @@ export const ChatStore = signalStore(
         alert('Error fetching');
       }
 
-      const wsUrl = 'ws://localhost:3000';
+      const wsUrl = environment.websocketUrl;
       socket = new WebSocket(`${wsUrl}?token=${token}`);
 
       socket.onopen = () => console.log('Connected to server');
