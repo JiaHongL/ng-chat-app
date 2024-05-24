@@ -23,7 +23,7 @@ import { FormsModule } from '@angular/forms';
 
     </div>
     <div>
-      <div class="font-semibold text-xl">{{  store.currentChatPartner()?.username }}</div>
+      <div class="font-semibold text-xl max-w-[250px] overflow-hidden text-ellipsis">{{  store.currentChatPartner()?.username }}</div>
       <div class="text-gray-500 text-sm">{{  store.currentChatPartner()?.status }}</div>
     </div>
   </div>
@@ -74,7 +74,7 @@ import { FormsModule } from '@angular/forms';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ChatWindowComponent {
-  @HostBinding('class') class = 'flex-1 flex flex-col';
+  @HostBinding('class') class = 'flex-1 flex flex-col min-w-[250px]';
   store = inject(ChatStore);
   chatBox = viewChild<ElementRef<HTMLDivElement>>('chatBox');
   message = signal<string>('');

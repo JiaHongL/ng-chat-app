@@ -17,8 +17,8 @@ import { ChatStore } from '../../store/chat.store';
     JsonPipe
   ],
   template: `
-  <div class="bg-gray-200 h-screen flex items-center justify-center">
-    <div class="flex w-4/5 h-4/5 bg-white rounded-lg shadow-lg">
+  <div class="bg-gray-200 h-screen min-w-[650px] flex items-center justify-center">
+    <div class="flex w-4/5 h-4/5 min-w-[650px] bg-white rounded-lg shadow-lg">
         <!-- Sidebar -->
         <app-conversation-list />
         <!-- Chat area -->

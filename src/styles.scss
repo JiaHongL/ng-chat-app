@@ -3,12 +3,18 @@
 @tailwind base;
 
 @layer base {
-    html,
-    body {
-        font-family: Roboto, "Helvetica Neue", sans-serif;
-        @apply m-0 h-full w-full text-base;
-        background: #f3f4f6;
-    }
+	html,
+	body {
+		font-family: Roboto, "Helvetica Neue", sans-serif;
+		@apply m-0 h-full w-full text-base;
+		background: #f3f4f6;
+	}
+
+	/* 只向右移動滾軸 5px */
+	.custom-scrollbar {
+		margin-right: -15px; /* 向右移動 5px */
+		padding-right: 15px; /* 內部填充 5px，避免內容被滾軸遮住 */
+	}
 }
 
 @tailwind components;
