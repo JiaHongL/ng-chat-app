@@ -88,7 +88,7 @@ import { ChatStore } from '../../../store/chat.store';
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ConversationListComponent {
-	@HostBinding('class') className = 'w-1/4 min-w-fit bg-gray-100 p-4 w-100 h-100';
+	@HostBinding('class') className = 'max-w-[250px] min-w-[250px] bg-gray-100 p-4 w-100 h-100';
 	store = inject(ChatStore);
 	userService = inject(UserService);
 }
