@@ -13,7 +13,7 @@ import { ChatStore } from '../../../store/chat.store';
 	template: `
   <div class="flex items-center mb-4">
       <img class="w-10 h-10 rounded-full mr-2 bg-white" src="https://api.dicebear.com/8.x/pixel-art/svg?seed=joe" alt="Profile Image">
-      <span class="font-semibold text-xl text-gray-900 max-w-[110px] overflow-hidden text-ellipsis">{{ store.userInfo()?.username }}</span>
+      <span class="font-semibold text-xl text-gray-900 max-w-[110px] text-nowrap overflow-hidden text-ellipsis">{{ store.userInfo()?.username }}</span>
       <button 
 	  	class="ml-auto bg-orange-500 hover:bg-orange-600 text-white rounded-full w-8 h-8 flex items-center justify-center"
 		(click)="userService.logout()"
@@ -72,7 +72,7 @@ import { ChatStore } from '../../../store/chat.store';
 								</div>
 								<div class="flex-grow overflow-hidden">
 										<div>
-												<div class="font-semibold max-w-[110px] overflow-hidden text-ellipsis">{{ user.username }}</div>
+												<div class="font-semibold max-w-[110px] text-nowrap overflow-hidden text-ellipsis">{{ user.username }}</div>
 												<div class="w-4/5 text-gray-500 text-sm whitespace-nowrap overflow-hidden overflow-ellipsis"> {{ user?.lastMessage?.message }}</div>
 										</div>
 										<span class="absolute top-2 right-2 text-blue-500 text-sm">{{ user?.lastMessage?.date | date: 'HH:mm' }}</span>

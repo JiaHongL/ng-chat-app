@@ -14,7 +14,7 @@ import { ChatStore } from '../../../store/chat.store';
 				<h3 class="font-semibold text-sm text-green-500">Online</h3>
 		</div>
 		<div class="flex-0 mb-3">
-				<ul>
+				<ul class="overflow-hidden">
 					@for (user of store.onlineUsers(); track user.username) {
 						<li
 								class="cursor-pointer flex items-center p-2 rounded-lg shadow mb-2 bg-white"
@@ -26,7 +26,7 @@ import { ChatStore } from '../../../store/chat.store';
 								alt="Profile Image"
 								/>
 								<div>
-								<div class="font-semibold text-gray-700 max-w-[100px] overflow-hidden text-ellipsis">{{user.username}}</div>
+								<div class="font-semibold text-gray-700 max-w-[100px] text-nowrap overflow-hidden text-ellipsis">{{user.username}}</div>
 								</div>
 						</li>
 					}
@@ -35,8 +35,8 @@ import { ChatStore } from '../../../store/chat.store';
 		<div class="flex-grow-0">
 				<h3 class="font-semibold text-sm text-gray-500">Offline</h3>
 		</div>
-		<div class="flex-0 overflow-scroll">
-				<ul>
+		<div class="flex-0">
+				<ul class="overflow-hidden">
 					@for (user of store.offlineUsers(); track user.username) {
 						<li
 								class="cursor-pointer flex items-center p-2 rounded-lg shadow mb-2 bg-gray-200 opacity-50"
@@ -48,7 +48,7 @@ import { ChatStore } from '../../../store/chat.store';
 								alt="Profile Image"
 								/>
 								<div>
-								<div class="font-semibold text-gray-700 max-w-[100px] overflow-hidden text-ellipsis">{{user.username}}</div>
+								<div class="font-semibold text-gray-700 max-w-[100px] text-nowrap overflow-hidden text-ellipsis">{{user.username}}</div>
 								</div>
 						</li>
 					}

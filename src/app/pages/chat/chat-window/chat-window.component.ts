@@ -12,7 +12,7 @@ import { FormsModule } from '@angular/forms';
     FormsModule
   ],
   template: `
-  <div class="flex items-center p-4 border-b">
+  <div class="flex items-center p-4 border-b overflow-hidden">
     <div class="relative">
       <img class="w-10 h-10 rounded-full mr-2" [src]="currentChatPartnerAvatarUrl()" alt="Profile Image">
       @if(store.currentChatPartner()?.status === 'online'){
@@ -23,7 +23,7 @@ import { FormsModule } from '@angular/forms';
 
     </div>
     <div>
-      <div class="font-semibold text-xl max-w-[250px] overflow-hidden text-ellipsis">{{  store.currentChatPartner()?.username }}</div>
+      <div class="font-semibold text-xl text-nowrap overflow-hidden text-ellipsis">{{  store.currentChatPartner()?.username }}</div>
       <div class="text-gray-500 text-sm">{{  store.currentChatPartner()?.status }}</div>
     </div>
   </div>
