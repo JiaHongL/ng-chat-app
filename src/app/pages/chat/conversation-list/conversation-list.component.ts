@@ -2,13 +2,15 @@ import { UserService } from './../../../services/user.service';
 import { CommonModule, DatePipe, JsonPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, HostBinding, inject } from '@angular/core';
 import { ChatStore } from '../../../store/chat.store';
+import { SafeHtmlPipe } from '../../../shared/pipes/safe-html.pipe';
 
 @Component({
 	selector: 'app-conversation-list',
 	standalone: true,
 	imports: [
 		CommonModule,
-		DatePipe
+		DatePipe,
+		SafeHtmlPipe
 	],
 	template: `
   <div class="flex items-center mb-4">
@@ -39,7 +41,7 @@ import { ChatStore } from '../../../store/chat.store';
 					<div class="flex-grow overflow-hidden">
 							<div>
 									<div class="font-semibold">general</div>
-									<div class="w-4/5 text-gray-500 text-sm whitespace-nowrap overflow-hidden overflow-ellipsis">{{ store.messageNotifications().general.lastMessage.message }}</div>
+									<div class="w-4/5 text-gray-500 text-sm whitespace-nowrap overflow-hidden overflow-ellipsis">{{ store.messageNotifications().general.lastMessage.message | appSafeHtml }}</div>
 							</div>
 							<span class="absolute top-2 right-2 text-blue-500 text-sm">{{ store.messageNotifications().general.lastMessage.date | date: 'HH:mm'  }}</span>
 							@if(store.messageNotifications().general.unreadCount){
@@ -72,8 +74,8 @@ import { ChatStore } from '../../../store/chat.store';
 								</div>
 								<div class="flex-grow overflow-hidden">
 										<div>
-												<div class="font-semibold max-w-[110px] text-nowrap overflow-hidden text-ellipsis">{{ user.username }}</div>
-												<div class="w-4/5 text-gray-500 text-sm whitespace-nowrap overflow-hidden overflow-ellipsis"> {{ user?.lastMessage?.message }}</div>
+												<div class="font-semibold max-w-[110px] text-nowrap overflow-hidden text-ellipsis">{{ user.username | appSafeHtml }}</div>
+												<div class="w-4/5 text-gray-500 text-sm whitespace-nowrap overflow-hidden overflow-ellipsis"> {{ user?.lastMessage?.message ?? '' | appSafeHtml  }}</div>
 										</div>
 										<span class="absolute top-2 right-2 text-blue-500 text-sm">{{ user?.lastMessage?.date | date: 'HH:mm' }}</span>
 										@if(user?.unreadCount){
