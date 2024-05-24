@@ -1,9 +1,10 @@
-import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { CommonModule, JsonPipe } from '@angular/common';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 
 import { UserStatusListComponent } from './user-status-list/user-status-list.component';
 import { ConversationListComponent } from './conversation-list/conversation-list.component';
 import { ChatWindowComponent } from './chat-window/chat-window.component';
+import { ChatStore } from '../../store/chat.store';
 
 @Component({
   selector: 'app-chat',
@@ -12,7 +13,8 @@ import { ChatWindowComponent } from './chat-window/chat-window.component';
     CommonModule,
     UserStatusListComponent,
     ConversationListComponent,
-    ChatWindowComponent
+    ChatWindowComponent,
+    JsonPipe
   ],
   template: `
   <div class="bg-gray-200 h-screen flex items-center justify-center">
@@ -28,4 +30,15 @@ import { ChatWindowComponent } from './chat-window/chat-window.component';
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ChatComponent { }
+export class ChatComponent {
+  store = inject(ChatStore);
+
+  constructor() {
+    this.store.connectWebSocket();
+  }
+
+  ngOnDestroy() {
+    this.store.disconnectWebSocket();
+  }
+
+}

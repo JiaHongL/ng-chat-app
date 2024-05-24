@@ -69,7 +69,7 @@ export class RegisterDialogComponent {
         this.dialogRef.close();
         this.dialog.open(NotificationDialogComponent, {
           data: {
-            message: '註冊成功！'
+            message: 'Registration successful!'
           }
         });
       },
