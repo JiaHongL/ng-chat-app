@@ -75,11 +75,11 @@ export const ChatStore = signalStore(
     })
   })),
   withMethods((store) => {
-    const userService = inject(UserService);
-    const token = userService.getToken();
     let socket: WebSocket | null = null;
 
     const connectWebSocket = async () => {
+      const userService = inject(UserService);
+      const token = userService.getToken();
 
       try {
         // 取得使用者資訊
@@ -202,6 +202,10 @@ export const ChatStore = signalStore(
       markAsRead(room, 'private');
     }
 
+    const reset = () => {
+      patchState(store, initialState);
+    }
+
     return {
       connectWebSocket,
       disconnectWebSocket,
@@ -211,7 +215,8 @@ export const ChatStore = signalStore(
       sendGeneralMessage,
       markGeneralAsRead,
       sendPrivateMessage,
-      markPrivateAsRead
+      markPrivateAsRead,
+      reset
     };
   })
 );

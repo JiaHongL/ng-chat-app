@@ -5,6 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 
 import { tap } from 'rxjs';
+import { ChatStore } from '../store/chat.store';
 
 @Injectable({
   providedIn: 'root'
@@ -16,6 +17,7 @@ export class UserService {
   private http = inject(HttpClient);
   private token = signal(window.localStorage.getItem('token') ? window.localStorage.getItem('token') : '');
   private router = inject(Router);
+  private store = inject(ChatStore);
 
   saveLocalStorageEffect = effect(() => {
     const token = this.token() || '';
@@ -33,7 +35,16 @@ export class UserService {
 
   logout(){
     this.token.set('');
+    this.store.reset();
     this.router.navigate(['/login']);
+  }
+
+  resetData(){
+    this.http.get(this.prefixUrl + '/reset').subscribe(()=>{
+      this.token.set('');
+      this.store.reset();
+      this.router.navigate(['/login']);
+    });
   }
 
   register(data: {

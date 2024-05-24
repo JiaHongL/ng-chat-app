@@ -34,9 +34,7 @@ import { FormsModule } from '@angular/forms';
       @if(message.sender === store.userInfo()?.username){
         <div class="flex justify-end mb-4">
           <div>
-            <div class="bg-blue-500 text-white p-2 rounded-lg ml-10">
-              {{ message.message }}
-            </div>
+            <div class="bg-blue-500 text-white p-2 rounded-lg ml-10 whitespace-pre-wrap" [innerHTML]="message.message"></div>
             <div class="text-right text-xs text-gray-500 mt-1">
               {{ message.date | date: 'HH:mm' }}
             </div>
@@ -48,9 +46,7 @@ import { FormsModule } from '@angular/forms';
             <img class="w-6 h-6 rounded-full mr-2" src="https://api.dicebear.com/8.x/pixel-art/svg?seed={{message.sender}}" alt="Profile Image">
             <div class="text-sm font-semibold">{{ message.sender }}</div>
           </div>
-          <div class="bg-gray-200 p-2 rounded-lg mr-8">
-            {{ message.message }}
-          </div>
+          <div class="bg-gray-200 p-2 rounded-lg mr-8 whitespace-pre-wrap" [innerHTML]="message.message"></div>
           <div class="text-left text-xs text-gray-500 mt-1">{{ message.date | date: 'HH:mm' }}</div>
         </div>
       }
