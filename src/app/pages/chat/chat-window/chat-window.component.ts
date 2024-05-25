@@ -118,7 +118,7 @@ import { PickerComponent } from '@ctrl/ngx-emoji-mart';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ChatWindowComponent {
-  @HostBinding('class') class = 'relative pl-0 sm:pl-3 flex-1 flex flex-col min-w-[250px] h-screen sm:h-auto';
+  @HostBinding('class') class = 'relative pl-0 sm:pl-3 flex-1 flex flex-col min-w-[250px] sm:h-auto';
   store = inject(ChatStore);
   chatBox = viewChild<ElementRef<HTMLDivElement>>('chatBox');
   message = signal<string>('');

@@ -40,10 +40,10 @@ import { Title } from '@angular/platform-browser';
   <!-- mobile -->
   <div class="block sm:hidden">
     <div 
-      class="font-sans bg-gray-200 h-screen w-screen"
+      class="font-sans bg-gray-200 h-100 w-screen"
     >
       <div class="flex flex-col h-screen w-screen bg-white rounded-lg shadow-lg">
-          <div class="h-screen w-screen margin-2">
+          <div class="w-screen margin-2">
             <div [hidden]="viewState.currentView()!=='chatList'">
                 <app-conversation-list />
                 <app-bottom-navigation />
