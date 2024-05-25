@@ -133,16 +133,13 @@ export class ChatWindowComponent {
   cursorEnd = 0;
 
   constructor() {
-    console.log('ChatWindowComponent created');
     const userAgent = navigator.userAgent.toLowerCase();
     const isMobileDevice = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent);
     if(isMobileDevice){
       this.dynamicHeight.set({
-        height: 'calc(100vh - 250px)'
+        height: 'calc(100vh - 290px)'
       });
-      console.log('Mobile device detected');
-    }else{
-      console.log('Desktop device detected');
+      document.body.style.overflow = 'hidden';
     }
   }
 
