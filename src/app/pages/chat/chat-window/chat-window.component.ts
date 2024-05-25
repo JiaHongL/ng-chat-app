@@ -141,6 +141,8 @@ export class ChatWindowComponent {
           height: 'calc(100vh - 250px)'
         });
         console.log('Mobile device detected');
+      }else{
+        console.log('Desktop device detected');
       }
     });
   }
