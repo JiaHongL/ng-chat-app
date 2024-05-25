@@ -15,7 +15,7 @@ import { ViewStateService } from '../../../services/view-state.service';
 	],
 	template: `
 	<h2 class="sm:hidden text-center text-3xl">
-		ChatList
+		Chat
 	</h2>
 	<div class="hidden sm:flex items-center mb-4">
 		<img class="w-10 h-10 rounded-full mr-2 bg-white" src="https://api.dicebear.com/8.x/pixel-art/svg?seed=joe" alt="Profile Image">
