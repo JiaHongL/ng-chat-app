@@ -42,7 +42,7 @@ import { Title } from '@angular/platform-browser';
     <div 
       class="font-sans bg-gray-200 h-100 w-screen"
     >
-      <div class="flex flex-col h-screen w-screen bg-white rounded-lg shadow-lg">
+      <div class="flex flex-col w-screen bg-white rounded-lg shadow-lg">
           <div class="w-screen margin-2">
             <div [hidden]="viewState.currentView()!=='chatList'">
                 <app-conversation-list />
