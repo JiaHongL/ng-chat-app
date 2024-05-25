@@ -56,7 +56,7 @@ import { PickerComponent } from '@ctrl/ngx-emoji-mart';
   <!-- 中間訊息 -->
   <div 
     class="flex-grow-0 p-4 overflow-y-auto"
-    [style.height]="dynamicHeight()"
+    [ngStyle]="dynamicHeight()"
     #chatBox
     (click)="isShowEmojiMart.set(false)"
   >
@@ -124,7 +124,9 @@ export class ChatWindowComponent {
   message = signal<string>('');
   viewState = inject(ViewStateService);
 
-  dynamicHeight = signal<string>('calc(100vh - 180px)');
+  dynamicHeight = signal({
+    height: 'calc(100vh - 180px)'
+  });
   isShowEmojiMart = signal<boolean>(false);
   textArea = viewChild<ElementRef<HTMLTextAreaElement>>('textArea');
   cursorStart = 0;
@@ -135,7 +137,10 @@ export class ChatWindowComponent {
       const userAgent = navigator.userAgent.toLowerCase();
       const isMobileDevice = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent);
       if(isMobileDevice){
-        this.dynamicHeight.set('calc(100vh - 300px)');
+        this.dynamicHeight.set({
+          height: 'calc(100vh - 250px)'
+        });
+        console.log('Mobile device detected');
       }
     });
   }
