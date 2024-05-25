@@ -15,11 +15,12 @@ import { PickerComponent } from '@ctrl/ngx-emoji-mart';
     PickerComponent
   ],
   template: `
+  <!-- 頂部 -->
   <div 
-    class="flex items-center p-4 border-b overflow-hidden" 
+    class="flex flex-shrink-0 items-center p-4 border-b overflow-hidden" 
     (click)="isShowEmojiMart.set(false)"
   >
-    <div class="flex items-center p-2 bg-white" (click)="viewState.goBack()">
+    <div class="flex items-center p-2 bg-white" (click)="viewState.goBack();isShowEmojiMart.set(false)">
         <button class="block sm:hidden text-blue-500 flex items-center">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
@@ -52,6 +53,7 @@ import { PickerComponent } from '@ctrl/ngx-emoji-mart';
       <div class="text-gray-500 text-sm">{{  store.currentChatPartner()?.status }}</div>
     </div>
   </div>
+  <!-- 中間訊息 -->
   <div 
     class="flex-1 p-4 overflow-y-auto" 
     #chatBox
@@ -82,7 +84,8 @@ import { PickerComponent } from '@ctrl/ngx-emoji-mart';
 
     }
   </div>
-  <div class="p-4 border-t">
+  <!-- 輸入框 -->
+  <div class="p-4 border-t flex-shrink-0">
     <div class="flex items-center">
       <textarea 
         #textArea
@@ -100,13 +103,13 @@ import { PickerComponent } from '@ctrl/ngx-emoji-mart';
           <path d="M2 21l21-9-21-9v7l15 2-15 2v7z"></path>
         </svg>
       </button>
-      <div class="hidden sm:block p-2 text-4xl cursor-pointer" (click)="isShowEmojiMart.set(!isShowEmojiMart())">
+      <div class="p-2 text-4xl cursor-pointer" (click)="isShowEmojiMart.set(!isShowEmojiMart())">
         😀
       </div>
     </div>
   </div>
   @if(isShowEmojiMart()){
-    <div class="hidden sm:block absolute bottom-[85px] right-[10px] z-40">
+    <div class="absolute bottom-[85px] right-[10px] z-40">
       <emoji-mart (emojiClick)="addEmoji($event)"></emoji-mart>
     </div>
   }
