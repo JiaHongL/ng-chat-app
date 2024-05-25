@@ -20,6 +20,9 @@ import { ViewStateService } from '../../../services/view-state.service';
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
             </svg>
         </button>
+        <div class="block sm:hidden bg-red-500 text-white rounded-full w-4 h-4 text-xs flex items-center justify-center" *ngIf="store.allUnreadCount() > 0">
+          {{ store.allUnreadCount() }}
+        </div>
     </div>
     <div class="relative">
       <img class="w-10 h-10 rounded-full mr-2" [src]="currentChatPartnerAvatarUrl()" alt="Profile Image">
