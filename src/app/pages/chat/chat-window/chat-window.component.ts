@@ -140,6 +140,11 @@ export class ChatWindowComponent {
         height: 'calc(100vh - 290px)'
       });
     }
+    this.viewState.getCurrentView$().subscribe((view) => {
+      if(view === 'chatWindow'){
+        this.chatBoxScrollToBottom();
+      }
+    });
   }
 
   currentChatPartnerAvatarUrl = computed(() => {
@@ -155,7 +160,7 @@ export class ChatWindowComponent {
     const chatPartner = this.store.currentChatPartner();
     if(chatPartner){
       setTimeout(() => {
-        this.chatBox()?.nativeElement.scrollTo(0, this.chatBox()?.nativeElement.scrollHeight as number);
+        this.chatBoxScrollToBottom();
         this.isShowEmojiMart.set(false);
       });
     }
@@ -164,9 +169,7 @@ export class ChatWindowComponent {
   currentChatMessagesChangeEffect = effect(() => {
     const currentChatMessages = this.store.currentChatMessages();
     if(currentChatMessages){
-      setTimeout(() => {
-        this.chatBox()?.nativeElement.scrollTo(0, this.chatBox()?.nativeElement.scrollHeight as number);
-      });
+      this.chatBoxScrollToBottom();
     }
   });
 
@@ -247,6 +250,12 @@ export class ChatWindowComponent {
       myField.selectionStart = this.cursorStart;
       myField.selectionEnd = this.cursorEnd;
       myField.focus();
+    });
+  }
+
+  chatBoxScrollToBottom(){
+    setTimeout(() => {
+      this.chatBox()?.nativeElement.scrollTo(0, this.chatBox()?.nativeElement.scrollHeight as number);
     });
   }
 
