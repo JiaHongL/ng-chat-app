@@ -55,7 +55,8 @@ import { PickerComponent } from '@ctrl/ngx-emoji-mart';
   </div>
   <!-- 中間訊息 -->
   <div 
-    class="flex-1 p-4 overflow-y-auto" 
+    class="flex-grow-0 p-4 overflow-y-auto"
+    style="height:calc(100vh - 180px)" 
     #chatBox
     (click)="isShowEmojiMart.set(false)"
   >
