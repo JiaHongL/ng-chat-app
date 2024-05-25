@@ -252,6 +252,10 @@ export class ChatWindowComponent {
       myField.selectionEnd = this.cursorEnd;
       myField.focus();
     });
+    setTimeout(() => {
+      document.body.scrollTop = 0
+      document.documentElement.scrollTop = 0
+    }, 100);
   }
 
 }
