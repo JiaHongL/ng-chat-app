@@ -104,13 +104,13 @@ import { PickerComponent } from '@ctrl/ngx-emoji-mart';
           <path d="M2 21l21-9-21-9v7l15 2-15 2v7z"></path>
         </svg>
       </button>
-      <div class="p-2 text-4xl cursor-pointer" (click)="isShowEmojiMart.set(!isShowEmojiMart())">
+      <div class="hidden sm:block p-2 text-4xl cursor-pointer" (click)="isShowEmojiMart.set(!isShowEmojiMart())">
         😀
       </div>
     </div>
   </div>
   @if(isShowEmojiMart()){
-    <div class="absolute bottom-[85px] right-[10px] z-40">
+    <div class="hidden sm:block  absolute bottom-[85px] right-[10px] z-40">
       <emoji-mart (emojiClick)="addEmoji($event)"></emoji-mart>
     </div>
   }

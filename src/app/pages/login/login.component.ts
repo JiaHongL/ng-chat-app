@@ -23,7 +23,7 @@ import { NotificationDialogComponent } from '../../shared/components/notificatio
   ],
   template: `
   <div class="flex items-center justify-center min-h-screen">
-    <div class="bg-white p-8 rounded-lg shadow-xl sm:max-w-md sm:w-full">
+    <div class="bg-white p-4 rounded-lg shadow-xl sm:max-w-md sm:w-full">
       <div class="flex justify-center mb-6">
         <div class="bg-blue-100 p-3 rounded-full">
           <svg class="w-10 h-10 text-blue-500" fill="currentColor" viewBox="0 0 20 20">

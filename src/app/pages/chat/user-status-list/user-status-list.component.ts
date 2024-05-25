@@ -45,7 +45,7 @@ import { ViewStateService } from '../../../services/view-state.service';
 				<h3 class="font-semibold text-sm text-gray-500">Offline - {{ store.offlineUsers().length }}</h3>
 		</div>
 		<div class="flex-0">
-				<ul class="overflow-hidden pb-[100px] sm:pb-0">
+				<ul class="overflow-hidden pb-[250px] sm:pb-0">
 					@for (user of store.offlineUsers(); track user.username) {
 						<li
 								class="cursor-pointer flex items-center p-2 rounded-lg shadow mb-2 bg-gray-200 opacity-50"

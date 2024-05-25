@@ -61,7 +61,7 @@ import { ViewStateService } from '../../../services/view-state.service';
 	</div>
 
 	<h3 class="font-semibold text-sm text-gray-300 mb-1">Private Message</h3>
-	<ul class="pb-[100px] sm:pb-0 sm:max-h-73 sm:overflow-scroll custom-scrollbar">
+	<ul class="pb-[250px] sm:pb-0 sm:max-h-73 sm:overflow-scroll custom-scrollbar">
 		<!-- Repeat similar list items for other contacts -->
 			@for (user of store.messageNotifications().private; track user.username) {
 				@if(user?.lastMessage){
