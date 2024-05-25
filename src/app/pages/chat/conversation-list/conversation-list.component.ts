@@ -18,8 +18,10 @@ import { ViewStateService } from '../../../services/view-state.service';
 		Chat
 	</h2>
 	<div class="hidden sm:flex items-center mb-4">
-		<img class="w-10 h-10 rounded-full mr-2 bg-white" src="https://api.dicebear.com/8.x/pixel-art/svg?seed=joe" alt="Profile Image">
-		<span class="font-semibold text-xl text-gray-900 max-w-[110px] text-nowrap overflow-hidden text-ellipsis">{{ store.userInfo()?.username }}</span>
+		@if(store.userInfo()?.username ){
+			<img class="w-10 h-10 rounded-full mr-2 bg-white" src="https://api.dicebear.com/8.x/pixel-art/svg?seed={{ store.userInfo()?.username }}" alt="Profile Image">
+			<span class="font-semibold text-xl text-gray-900 max-w-[110px] text-nowrap overflow-hidden text-ellipsis">{{ store.userInfo()?.username }}</span>
+		}
 		<button 
 			class="ml-auto bg-orange-500 hover:bg-orange-600 text-white rounded-full w-8 h-8 flex items-center justify-center"
 			(click)="userService.logout()"
@@ -30,7 +32,7 @@ import { ViewStateService } from '../../../services/view-state.service';
 		</button>
 	</div>
 
-	<h3 class="font-semibold text-sm text-gray-300 mb-1">General</h3>
+	<h3 class="font-semibold text-sm text-gray-500 mb-1">General</h3>
 	<div class="cursor-pointer mb-2" (click)="store.setCurrentRoom('general');viewState.goToChatView()">
 			<div 
 				class="flex items-center p-2 rounded-lg bg-white shadow relative"
@@ -60,7 +62,7 @@ import { ViewStateService } from '../../../services/view-state.service';
 			</div>
 	</div>
 
-	<h3 class="font-semibold text-sm text-gray-300 mb-1">Private Message</h3>
+	<h3 class="font-semibold text-sm text-gray-500 mb-1">Private Message</h3>
 	<ul class="pb-[250px] sm:pb-0 sm:max-h-73 sm:overflow-scroll custom-scrollbar">
 		<!-- Repeat similar list items for other contacts -->
 			@for (user of store.messageNotifications().private; track user.username) {
