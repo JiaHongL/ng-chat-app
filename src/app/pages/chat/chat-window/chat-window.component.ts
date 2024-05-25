@@ -213,6 +213,10 @@ export class ChatWindowComponent {
 
     this.message.set('');
     this.isShowEmojiMart.set(false);
+    setTimeout(() => {
+      document.body.scrollTop = 0
+      document.documentElement.scrollTop = 0
+    }, 100);
   }
 
   addEmoji(event:any){
