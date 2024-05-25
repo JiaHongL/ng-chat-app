@@ -7,7 +7,7 @@ type View = 'friendList' | 'chatList' | 'chatWindow';
   providedIn: 'root',
 })
 export class ViewStateService {
-  private startView:View = 'chatList';
+  private startView: View = 'chatList';
   private _currentView = new BehaviorSubject<View>(this.startView);
   private previousView!: View;
 
@@ -25,7 +25,7 @@ export class ViewStateService {
   });
 
   effectMobile = effect(() => {
-    if(this.isMobile()){
+    if (this.isMobile()) {
       this.goToFriendList();
     }
   });
@@ -41,12 +41,12 @@ export class ViewStateService {
     });
     this.resizeObservable$ = fromEvent(window, 'resize')
     this.resizeSubscription$ = this.resizeObservable$
-    .pipe(
-      debounceTime(200)
-    )
-    .subscribe( (event:any) => {
-      this.innerWidth.set(event?.target?.innerWidth);
-    })
+      .pipe(
+        debounceTime(200)
+      )
+      .subscribe((event: any) => {
+        this.innerWidth.set(event?.target?.innerWidth);
+      })
   }
 
   getCurrentView$() {
@@ -73,7 +73,11 @@ export class ViewStateService {
     this._currentView.next(this.previousView);
   }
 
-  ngOnDestroy(){
-    this.resizeSubscription$.unsubscribe();
+  resetScroll(ms = 200) {
+    setTimeout(() => {
+      document.body.scrollTop = 0;
+      document.documentElement.scrollTop = 0;
+    }, ms);
   }
+
 }

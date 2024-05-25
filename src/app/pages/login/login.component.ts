@@ -81,6 +81,7 @@ export class LoginComponent {
       .subscribe({
         next: () => {
           if(this.viewStateService.isMobile()){
+            this.viewStateService.resetScroll(0);
             this.viewStateService.goToFriendList();
           }
           this.router.navigate(['/chat']);
