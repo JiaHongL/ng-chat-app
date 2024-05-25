@@ -1,5 +1,5 @@
 export const environment = {
     production: false,
-    apiUrl: 'https://chat-app-backend-t7ug.onrender.com/api',
-    websocketUrl: 'wss://chat-app-backend-t7ug.onrender.com',
+    apiUrl: 'http://localhost:3000/api',
+    websocketUrl: 'ws://localhost:3000',
 };
