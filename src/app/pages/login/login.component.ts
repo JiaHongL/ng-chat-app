@@ -7,6 +7,7 @@ import { FormsModule } from '@angular/forms';
 import { Dialog } from '@angular/cdk/dialog';
 
 import { UserService } from '../../services/user.service';
+import { ViewStateService } from './../../services/view-state.service';
 
 import { RegisterDialogComponent } from './register-dialog/register-dialog.component';
 import { NotificationDialogComponent } from '../../shared/components/notification-dialog/notification-dialog.component';
@@ -22,7 +23,7 @@ import { NotificationDialogComponent } from '../../shared/components/notificatio
   ],
   template: `
   <div class="flex items-center justify-center min-h-screen">
-    <div class="bg-white p-8 rounded-lg shadow-xl max-w-md w-full">
+    <div class="bg-white p-8 rounded-lg shadow-xl sm:max-w-md sm:w-full">
       <div class="flex justify-center mb-6">
         <div class="bg-blue-100 p-3 rounded-full">
           <svg class="w-10 h-10 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
@@ -30,7 +31,7 @@ import { NotificationDialogComponent } from '../../shared/components/notificatio
           </svg>
         </div>
       </div>
-      <h2 class="text-3xl font-bold text-gray-900 text-center mb-4">Chat!</h2>
+      <h2 class="text-3xl font-bold text-gray-900 text-center mb-2 sm:mb-4">Chat!</h2>
       <p class="text-gray-500 text-center mb-6">Don't have an account yet? <a class="text-blue-500 cursor-pointer" (click)="openRegisterDialog()">Sign up</a></p>
       <form #loginForm="ngForm">
         <div class="mb-4">
@@ -58,6 +59,7 @@ import { NotificationDialogComponent } from '../../shared/components/notificatio
 export class LoginComponent {
   router = inject(Router);
   userService = inject(UserService);
+  viewStateService = inject(ViewStateService);
   dialog = inject(Dialog);
 
   username = signal<string>('joe');
@@ -78,6 +80,9 @@ export class LoginComponent {
       .login(data)
       .subscribe({
         next: () => {
+          if(this.viewStateService.isMobile()){
+            this.viewStateService.goToFriendList();
+          }
           this.router.navigate(['/chat']);
         },
         error: () => {

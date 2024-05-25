@@ -17,7 +17,7 @@ import { NotificationDialogComponent } from '../../../shared/components/notifica
   ],
   template: `
     <div class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center">
-      <div class="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
+      <div class="bg-white p-8 rounded-lg shadow-lg w-96 sm:max-w-md sm:w-full">
         <div class="flex justify-between items-center mb-6">
           <h2 class="text-2xl font-bold text-gray-900">Register</h2>
           <button (click)="close()" type="button" class="text-gray-400 hover:text-gray-600">

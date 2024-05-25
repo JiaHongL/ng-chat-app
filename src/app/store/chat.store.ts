@@ -49,6 +49,15 @@ export const ChatStore = signalStore(
       };
 
     }),
+    allUnreadCount: computed(() => {
+      const generalUnreadCount = store.unreadCounts()['general'] || 0;
+      const privateUnreadCounts = store.users().map(user => {
+        const username = user.username;
+        const room = `private_${username}_${store.userInfo()?.username}`;
+        return store.unreadCounts()[room] || 0;
+      });
+      return generalUnreadCount + privateUnreadCounts.reduce((acc, count) => acc + count, 0);
+    }),
     currentChatPartner: computed(() => {
       const currentRoom = store.currentRoom();
       if (currentRoom.startsWith('private_')) {

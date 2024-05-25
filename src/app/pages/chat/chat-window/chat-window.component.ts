@@ -2,6 +2,7 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, ElementRef, HostBinding, computed, effect, inject, signal, viewChild } from '@angular/core';
 import { ChatStore } from '../../../store/chat.store';
 import { FormsModule } from '@angular/forms';
+import { ViewStateService } from '../../../services/view-state.service';
 
 @Component({
   selector: 'app-chat-window',
@@ -13,6 +14,13 @@ import { FormsModule } from '@angular/forms';
   ],
   template: `
   <div class="flex items-center p-4 border-b overflow-hidden">
+    <div class="flex items-center p-2 bg-white" (click)="viewState.goBack()">
+        <button class="block sm:hidden text-blue-500 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+        </button>
+    </div>
     <div class="relative">
       <img class="w-10 h-10 rounded-full mr-2" [src]="currentChatPartnerAvatarUrl()" alt="Profile Image">
       @if(store.currentChatPartner()?.status === 'online'){
@@ -23,8 +31,8 @@ import { FormsModule } from '@angular/forms';
 
     </div>
     <div>
-      <div class="flex items-center font-semibold text-xl text-nowrap overflow-hidden text-ellipsis">
-        <div class="mr-1">
+      <div class="flex items-center font-semibold">
+        <div class="mr-1 text-xl max-w-[250px] sm:max-w-[350px] text-nowrap overflow-hidden text-ellipsis">
           {{  store.currentChatPartner()?.username }}
         </div>
         @if(store.currentChatPartner()?.username === 'general'){
@@ -83,10 +91,11 @@ import { FormsModule } from '@angular/forms';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ChatWindowComponent {
-  @HostBinding('class') class = 'flex-1 flex flex-col min-w-[250px]';
+  @HostBinding('class') class = 'pl-0 sm:pl-3 flex-1 flex flex-col min-w-[250px] h-screen sm:h-auto';
   store = inject(ChatStore);
   chatBox = viewChild<ElementRef<HTMLDivElement>>('chatBox');
   message = signal<string>('');
+  viewState = inject(ViewStateService);
 
   currentChatPartnerAvatarUrl = computed(() => {
     const partner = this.store.currentChatPartner();
@@ -120,12 +129,20 @@ export class ChatWindowComponent {
     const room = this.store.currentRoom();
     // 已讀私人訊息的房間(別人傳來的訊息)，名稱為 `private_${對方的使用者名稱}_${自己的使用者名稱}`，就是已讀對方傳送的訊息
     const receiveRoom = `private_${this.store.currentChatPartner()?.username}_${this.store.userInfo()?.username}`;
+
+    // 如果是手機裝置，且當前視圖不是聊天視圖，就不標記已讀
+    if(
+      this.viewState.isMobile() &&
+      this.viewState.currentView() !== 'chatWindow'
+    ){
+      return;
+    }
+
     if(
       room === 'general'&& 
       unreadCounts[room] > 0
     ){
       this.store.markGeneralAsRead();
-      console.log('Marked general as read');
     }
     if(
       room !== 'general' && 
