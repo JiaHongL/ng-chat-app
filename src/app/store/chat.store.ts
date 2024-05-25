@@ -203,7 +203,6 @@ export const ChatStore = signalStore(
               "type": type,
           }
       }));
-      console.log('Marked as read~');
     }
 
     const markGeneralAsRead = () => {
