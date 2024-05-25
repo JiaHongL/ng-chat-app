@@ -18,7 +18,7 @@ import { ChatStore } from '../../store/chat.store';
   ],
   template: `
   <div 
-    class="bg-gray-200 h-screen min-w-[700px] flex items-center justify-center"
+    class="font-sans bg-gray-200 h-screen min-w-[700px] flex items-center justify-center"
     [ngClass]="{'animate-pulse': !store.isSocketStable()}"
   >
     <div class="flex w-4/5 h-4/5 min-w-[700px] bg-white rounded-lg shadow-lg">
