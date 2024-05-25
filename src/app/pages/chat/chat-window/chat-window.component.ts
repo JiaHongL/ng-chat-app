@@ -96,7 +96,7 @@ import { PickerComponent } from '@ctrl/ngx-emoji-mart';
         rows="2" 
         style="line-height: 1.5;"
         (focus)="saveSelection()" 
-        (blur)="saveSelection()"
+        (blur)="saveSelection();resetScroll()"
         (keydown.enter)="sendMessage($event)"
       ></textarea>
       <button class="ml-2 bg-blue-500 text-white rounded-full w-10 h-10 flex items-center justify-center" (click)="sendMessage()">
@@ -139,7 +139,6 @@ export class ChatWindowComponent {
       this.dynamicHeight.set({
         height: 'calc(100vh - 290px)'
       });
-      document.body.style.overflow = 'hidden';
     }
   }
 
@@ -213,10 +212,7 @@ export class ChatWindowComponent {
 
     this.message.set('');
     this.isShowEmojiMart.set(false);
-    setTimeout(() => {
-      document.body.scrollTop = 0
-      document.documentElement.scrollTop = 0
-    }, 100);
+    this.resetScroll();
   }
 
   addEmoji(event:any){
@@ -224,6 +220,13 @@ export class ChatWindowComponent {
     if (textAreaElement) {
       this.insertAtCursor(textAreaElement, event.emoji.native);
     }
+  }
+
+  resetScroll(){
+    setTimeout(() => {
+      document.body.scrollTop = 0;
+      document.documentElement.scrollTop = 0;
+  }, 200);
   }
 
   saveSelection() {
@@ -252,10 +255,6 @@ export class ChatWindowComponent {
       myField.selectionEnd = this.cursorEnd;
       myField.focus();
     });
-    setTimeout(() => {
-      document.body.scrollTop = 0
-      document.documentElement.scrollTop = 0
-    }, 100);
   }
 
 }
