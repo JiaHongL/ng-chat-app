@@ -7,6 +7,7 @@ import { ChatWindowComponent } from './chat-window/chat-window.component';
 import { ChatStore } from '../../store/chat.store';
 import { BottomNavigationComponent } from './bottom-navigation/bottom-navigation.component';
 import { ViewStateService } from '../../services/view-state.service';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-chat',
@@ -64,12 +65,45 @@ import { ViewStateService } from '../../services/view-state.service';
 export class ChatComponent {
   store = inject(ChatStore);
   viewState = inject(ViewStateService);
+  title = inject(Title);
+
+  intervalId = 0;
+  unreadMessagesEffect = effect(() => {
+    const isMobile = this.viewState.isMobile();
+    if(isMobile){
+      this.clearInterval();
+      return;
+    }
+    const count = this.store.allUnreadCount();
+    if (count > 0 && !this.intervalId) {
+      this.title.setTitle(`🔔 New messages ( ${count} )`);
+      this.intervalId = window.setInterval(() => {
+        if (this.title.getTitle().includes('New messages')) {
+          this.title.setTitle('NgChatApp');
+        } else {
+          this.title.setTitle(`🔔 New messages ( ${count} )`);
+        }
+      }, 700);
+    } else {
+      this.clearInterval();
+    }
+  })
 
   constructor() {
-    this.store.connectWebSocket();}
+    this.store.connectWebSocket();
+  }
+
+  clearInterval() {
+    if (this.intervalId){
+      window.clearInterval(this.intervalId);
+      this.intervalId = 0;
+      this.title.setTitle('NgChatApp');
+    }
+  }
 
   ngOnDestroy() {
     this.store.disconnectWebSocket();
+    this.clearInterval();
   }
 
 }
