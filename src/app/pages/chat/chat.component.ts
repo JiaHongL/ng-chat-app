@@ -1,13 +1,17 @@
 import { CommonModule, JsonPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, effect, inject } from '@angular/core';
+import { Title } from '@angular/platform-browser';
+
+import { ViewService } from '../../services/view.service';
+
+import { ChatStore } from '../../store/chat.store';
 
 import { UserStatusListComponent } from './user-status-list/user-status-list.component';
 import { ConversationListComponent } from './conversation-list/conversation-list.component';
 import { ChatWindowComponent } from './chat-window/chat-window.component';
-import { ChatStore } from '../../store/chat.store';
 import { BottomNavigationComponent } from './bottom-navigation/bottom-navigation.component';
-import { ViewService } from '../../services/view.service';
-import { Title } from '@angular/platform-browser';
+
+import { Subject, interval, map, startWith, takeUntil, tap } from 'rxjs';
 
 @Component({
   selector: 'app-chat',
@@ -65,48 +69,50 @@ import { Title } from '@angular/platform-browser';
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ChatComponent {
+export class ChatComponent implements OnDestroy {
   store = inject(ChatStore);
   viewService = inject(ViewService);
   title = inject(Title);
 
-  intervalId = 0;
+  private readonly destroy$ = new Subject<void>();
+
   unreadMessagesEffect = effect(() => {
-    const isMobile = this.viewService.isMobile();
-    if(isMobile){
-      this.clearInterval();
-      return;
-    }
     const count = this.store.allUnreadCount();
-    if (count > 0 && !this.intervalId) {
-      this.title.setTitle(`🔔 New messages ( ${count} )`);
-      this.intervalId = window.setInterval(() => {
-        if (this.title.getTitle().includes('New messages')) {
-          this.title.setTitle('NgChatApp');
-        } else {
-          this.title.setTitle(`🔔 New messages ( ${count} )`);
-        }
-      }, 700);
+
+    if (this.viewService.isRaelMobile) { return; }
+
+    if (count > 0) {
+      interval(700).pipe(
+        startWith(0),
+        map(() => this.title.getTitle()),
+        tap(currentTitle => {
+          if (currentTitle.includes('New messages')) {
+            this.title.setTitle('NgChatApp');
+          } else {
+            this.title.setTitle(`🔔 New messages ( ${count} )`);
+          }
+        }),
+        takeUntil(this.destroy$)
+      ).subscribe();
     } else {
-      this.clearInterval();
+      this.clearTitle();
     }
-  })
+    
+  });
 
   constructor() {
     this.store.connectWebSocket();
   }
 
-  clearInterval() {
-    if (this.intervalId){
-      window.clearInterval(this.intervalId);
-      this.intervalId = 0;
-      this.title.setTitle('NgChatApp');
-    }
+  clearTitle() {
+    this.destroy$.next();
+    this.title.setTitle('NgChatApp');
   }
 
   ngOnDestroy() {
     this.store.disconnectWebSocket();
-    this.clearInterval();
+    this.clearTitle();
+    this.destroy$.complete();
   }
 
 }
