@@ -176,13 +176,16 @@ export class ChatWindowComponent {
   unreadCountsChangeEffect = effect(() => {
     const unreadCounts = this.store.unreadCounts()
     const room = this.store.currentRoom();
+    const currentView = this.viewState.currentView();
+    const isMobile = this.viewState.isMobile();
+
     // 已讀私人訊息的房間(別人傳來的訊息)，名稱為 `private_${對方的使用者名稱}_${自己的使用者名稱}`，就是已讀對方傳送的訊息
     const receiveRoom = `private_${this.store.currentChatPartner()?.username}_${this.store.userInfo()?.username}`;
 
     // 如果是手機裝置，且當前視圖不是聊天視圖，就不標記已讀
     if(
-      this.viewState.isMobile() &&
-      this.viewState.currentView() !== 'chatWindow'
+      isMobile &&
+      currentView !== 'chatWindow'
     ){
       return;
     }

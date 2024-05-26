@@ -8,8 +8,13 @@ type View = 'friendList' | 'chatList' | 'chatWindow';
 })
 export class ViewStateService {
   private startView: View = 'chatList';
-  private _currentView = new BehaviorSubject<View>(this.startView);
+  private _currentViewSignal = signal<View>(this.startView);
+  private _currentView$ = new BehaviorSubject<View>(this.startView);
   private previousView!: View;
+
+  currentViewUpdateEffect = effect(() => {
+    this._currentView$.next(this._currentViewSignal());
+  });
 
   resizeObservable$!: Observable<Event>;
   resizeSubscription$!: Subscription;
@@ -24,13 +29,15 @@ export class ViewStateService {
     return isMobileDevice || isSmallScreen;
   });
 
-  effectMobile = effect(() => {
+  mobileUpdateEffect = effect(() => {
     if (this.isMobile()) {
       this.goToFriendList();
     }
+  },{
+    allowSignalWrites: true
   });
 
-  currentView$ = this._currentView.asObservable().pipe(
+  currentView$ = this._currentView$.asObservable().pipe(
     startWith(this.startView),
     pairwise()
   );
@@ -50,27 +57,27 @@ export class ViewStateService {
   }
 
   getCurrentView$() {
-    return this._currentView.asObservable();
+    return this._currentView$.asObservable();
   }
 
   currentView() {
-    return this._currentView.getValue();
+    return this._currentViewSignal();
   }
 
   goToChatView() {
-    this._currentView.next('chatWindow');
+    this._currentViewSignal.set('chatWindow');
   }
 
   goToFriendList() {
-    this._currentView.next('friendList');
+    this._currentViewSignal.set('friendList');
   }
 
   goToChatList() {
-    this._currentView.next('chatList');
+    this._currentViewSignal.set('chatList');
   }
 
   goBack() {
-    this._currentView.next(this.previousView);
+    this._currentViewSignal.set(this.previousView);
   }
 
   resetScroll(ms = 200) {
