@@ -78,7 +78,7 @@ import { PickerComponent } from '@ctrl/ngx-emoji-mart';
             <img class="w-6 h-6 rounded-full mr-2" src="https://api.dicebear.com/8.x/pixel-art/svg?seed={{message.sender}}" alt="Profile Image">
             <div class="text-sm font-semibold">{{ message.sender }}</div>
           </div>
-          <div class="bg-gray-200 p-2 rounded-lg mr-8 whitespace-pre-wrap" [innerHTML]="message.message"></div>
+          <div class="w-fit bg-gray-200 p-2 rounded-lg mr-8 whitespace-pre-wrap" [innerHTML]="message.message"></div>
           <div class="text-left text-xs text-gray-500 mt-1">{{ message.date | date: 'HH:mm' }}</div>
         </div>
       }
