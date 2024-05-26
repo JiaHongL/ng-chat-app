@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, HostBinding, inject } from '@angular/core';
+
 import { ChatStore } from '../../../store/chat.store';
-import { ViewStateService } from '../../../services/view-state.service';
+import { ViewService } from '../../../services/view.service';
 
 @Component({
   selector: 'app-user-status-list',
@@ -22,7 +23,7 @@ import { ViewStateService } from '../../../services/view-state.service';
 					@for (user of store.onlineUsers(); track user.username) {
 						<li
 								class="cursor-pointer flex items-center p-2 rounded-lg shadow mb-2 bg-white"
-								(click)="store.setCurrentRoom('private_' + store.userInfo()?.username + '_' + user.username);viewState.goToChatView();"
+								(click)="store.setCurrentRoom('private_' + store.userInfo()?.username + '_' + user.username);viewService.goToChatView();"
 						>
 								<img
 								class="w-10 h-10 rounded-full mr-2"
@@ -49,7 +50,7 @@ import { ViewStateService } from '../../../services/view-state.service';
 					@for (user of store.offlineUsers(); track user.username) {
 						<li
 								class="cursor-pointer flex items-center p-2 rounded-lg shadow mb-2 bg-gray-200 opacity-50"
-								(click)="store.setCurrentRoom('private_' + store.userInfo()?.username + '_' + user.username);viewState.goToChatView()"
+								(click)="store.setCurrentRoom('private_' + store.userInfo()?.username + '_' + user.username);viewService.goToChatView()"
 						>
 								<img
 								class="w-10 h-10 rounded-full mr-2"
@@ -70,6 +71,5 @@ import { ViewStateService } from '../../../services/view-state.service';
 export class UserStatusListComponent {
   @HostBinding('class') class = 'h-screen sm:pb-0 sm:h-auto min-w-[200px] w-100 bg-gray-100 p-4 flex flex-nowrap flex-col';
   store = inject(ChatStore);
-  viewState = inject(ViewStateService);
-  
+  viewService = inject(ViewService);
 }

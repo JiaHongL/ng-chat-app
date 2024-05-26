@@ -7,7 +7,7 @@ import { FormsModule } from '@angular/forms';
 import { Dialog } from '@angular/cdk/dialog';
 
 import { UserService } from '../../services/user.service';
-import { ViewStateService } from './../../services/view-state.service';
+import { ViewService } from '../../services/view.service';
 
 import { RegisterDialogComponent } from './register-dialog/register-dialog.component';
 import { NotificationDialogComponent } from '../../shared/components/notification-dialog/notification-dialog.component';
@@ -59,7 +59,7 @@ import { NotificationDialogComponent } from '../../shared/components/notificatio
 export class LoginComponent {
   router = inject(Router);
   userService = inject(UserService);
-  viewStateService = inject(ViewStateService);
+  viewService = inject(ViewService);
   dialog = inject(Dialog);
 
   username = signal<string>('joe');
@@ -80,9 +80,9 @@ export class LoginComponent {
       .login(data)
       .subscribe({
         next: () => {
-          if(this.viewStateService.isMobile()){
-            this.viewStateService.resetScroll(0);
-            this.viewStateService.goToFriendList();
+          if(this.viewService.isMobile()){
+            this.viewService.resetScroll(0);
+            this.viewService.goToFriendList();
           }
           this.router.navigate(['/chat']);
         },

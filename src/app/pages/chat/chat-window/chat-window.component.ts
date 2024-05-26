@@ -1,8 +1,10 @@
-import { CommonModule, DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, ElementRef, HostBinding, computed, effect, inject, signal, viewChild } from '@angular/core';
-import { ChatStore } from '../../../store/chat.store';
+import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ViewStateService } from '../../../services/view-state.service';
+
+import { ViewService } from '../../../services/view.service';
+import { ChatStore } from '../../../store/chat.store';
+
 import { PickerComponent } from '@ctrl/ngx-emoji-mart';
 
 @Component({
@@ -20,7 +22,7 @@ import { PickerComponent } from '@ctrl/ngx-emoji-mart';
     class="flex flex-shrink-0 items-center p-4 border-b overflow-hidden" 
     (click)="isShowEmojiMart.set(false)"
   >
-    <div class="flex items-center p-2 bg-white" (click)="viewState.goBack();isShowEmojiMart.set(false)">
+    <div class="flex items-center p-2 bg-white" (click)="viewService.goBack();isShowEmojiMart.set(false)">
         <button class="block sm:hidden text-blue-500 flex items-center">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
@@ -96,7 +98,7 @@ import { PickerComponent } from '@ctrl/ngx-emoji-mart';
         rows="2" 
         style="line-height: 1.5;"
         (focus)="saveSelection()" 
-        (blur)="saveSelection();viewState.resetScroll()"
+        (blur)="saveSelection();viewService.resetScroll()"
         (keydown.enter)="sendMessage($event)"
       ></textarea>
       <button class="ml-2 bg-blue-500 text-white rounded-full w-10 h-10 flex items-center justify-center" (click)="sendMessage()">
@@ -122,7 +124,7 @@ export class ChatWindowComponent {
   store = inject(ChatStore);
   chatBox = viewChild<ElementRef<HTMLDivElement>>('chatBox');
   message = signal<string>('');
-  viewState = inject(ViewStateService);
+  viewService = inject(ViewService);
 
   dynamicHeight = signal({
     height: 'calc(100vh - 180px)'
@@ -140,7 +142,7 @@ export class ChatWindowComponent {
         height: 'calc(100vh - 290px)'
       });
     }
-    this.viewState.getCurrentView$().subscribe((view) => {
+    this.viewService.getCurrentView$().subscribe((view) => {
       if(view === 'chatWindow'){
         this.chatBoxScrollToBottom();
       }
@@ -176,8 +178,8 @@ export class ChatWindowComponent {
   unreadCountsChangeEffect = effect(() => {
     const unreadCounts = this.store.unreadCounts()
     const room = this.store.currentRoom();
-    const currentView = this.viewState.currentView();
-    const isMobile = this.viewState.isMobile();
+    const currentView = this.viewService.currentView();
+    const isMobile = this.viewService.isMobile();
 
     // 已讀私人訊息的房間(別人傳來的訊息)，名稱為 `private_${對方的使用者名稱}_${自己的使用者名稱}`，就是已讀對方傳送的訊息
     const receiveRoom = `private_${this.store.currentChatPartner()?.username}_${this.store.userInfo()?.username}`;
@@ -218,7 +220,7 @@ export class ChatWindowComponent {
 
     this.message.set('');
     this.isShowEmojiMart.set(false);
-    this.viewState.resetScroll();
+    this.viewService.resetScroll();
   }
 
   addEmoji(event:any){

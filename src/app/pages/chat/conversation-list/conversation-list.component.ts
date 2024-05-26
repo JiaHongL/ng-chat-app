@@ -1,9 +1,12 @@
-import { UserService } from './../../../services/user.service';
-import { CommonModule, DatePipe, JsonPipe } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, HostBinding, inject } from '@angular/core';
+
 import { ChatStore } from '../../../store/chat.store';
+
 import { SafeHtmlPipe } from '../../../shared/pipes/safe-html.pipe';
-import { ViewStateService } from '../../../services/view-state.service';
+
+import { ViewService } from '../../../services/view.service';
+import { UserService } from './../../../services/user.service';
 
 @Component({
 	selector: 'app-conversation-list',
@@ -33,12 +36,12 @@ import { ViewStateService } from '../../../services/view-state.service';
 	</div>
 
 	<h3 class="font-semibold text-sm text-gray-500 mb-1">General</h3>
-	<div class="cursor-pointer mb-2" (click)="store.setCurrentRoom('general');viewState.goToChatView()">
+	<div class="cursor-pointer mb-2" (click)="store.setCurrentRoom('general');viewService.goToChatView()">
 			<div 
 				class="flex items-center p-2 rounded-lg bg-white shadow relative"
 				[ngClass]="{ 
-							'bg-blue-100': store.currentChatPartner()?.username === 'general' && !viewState.isMobile(),
-							'bg-white': store.currentChatPartner()?.username !== 'general' || viewState.isMobile(),
+							'bg-blue-100': store.currentChatPartner()?.username === 'general' && !viewService.isMobile(),
+							'bg-white': store.currentChatPartner()?.username !== 'general' || viewService.isMobile(),
 						}"
 			>
 					<div class="relative flex-shrink-0 flex-grow-0">
@@ -67,12 +70,12 @@ import { ViewStateService } from '../../../services/view-state.service';
 		<!-- Repeat similar list items for other contacts -->
 			@for (user of store.messageNotifications().private; track user.username) {
 				@if(user?.lastMessage){
-					<li class="cursor-pointer mb-2" (click)="store.setCurrentRoom(user.room);viewState.goToChatView()">
+					<li class="cursor-pointer mb-2" (click)="store.setCurrentRoom(user.room);viewService.goToChatView()">
 							<div 
 								class="flex items-center p-2 rounded-lg bg-blue-100 shadow relative"
 								[ngClass]="{ 
-									'bg-blue-100': store.currentChatPartner()?.username === user.username && !viewState.isMobile(),
-									'bg-white': store.currentChatPartner()?.username !== user.username || viewState.isMobile(),
+									'bg-blue-100': store.currentChatPartner()?.username === user.username && !viewService.isMobile(),
+									'bg-white': store.currentChatPartner()?.username !== user.username || viewService.isMobile(),
 								}"
 							>
 									<div class="relative flex-shrink-0 flex-grow-0">
@@ -105,5 +108,5 @@ export class ConversationListComponent {
 	@HostBinding('class') className = 'z-10 overflow-scroll custom-scrollbar inline-block w-screen h-screen sm:h-auto p-4 sm:max-w-[250px] sm:min-w-[250px] bg-gray-100 sm:p-4 sm:w-100 sm:h-100';
 	store = inject(ChatStore);
 	userService = inject(UserService);
-	viewState = inject(ViewStateService);
+	viewService = inject(ViewService);
 }

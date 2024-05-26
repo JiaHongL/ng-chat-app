@@ -6,7 +6,7 @@ type View = 'friendList' | 'chatList' | 'chatWindow';
 @Injectable({
   providedIn: 'root',
 })
-export class ViewStateService {
+export class ViewService {
   private startView: View = 'chatList';
   private _currentViewSignal = signal<View>(this.startView);
   private _currentView$ = new BehaviorSubject<View>(this.startView);

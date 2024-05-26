@@ -6,7 +6,7 @@ import { ConversationListComponent } from './conversation-list/conversation-list
 import { ChatWindowComponent } from './chat-window/chat-window.component';
 import { ChatStore } from '../../store/chat.store';
 import { BottomNavigationComponent } from './bottom-navigation/bottom-navigation.component';
-import { ViewStateService } from '../../services/view-state.service';
+import { ViewService } from '../../services/view.service';
 import { Title } from '@angular/platform-browser';
 
 @Component({
@@ -44,15 +44,15 @@ import { Title } from '@angular/platform-browser';
     >
       <div class="flex flex-col w-screen bg-white rounded-lg shadow-lg">
           <div class="w-screen margin-2">
-            <div [hidden]="viewState.currentView()!=='chatList'">
+            <div [hidden]="viewService.currentView()!=='chatList'">
                 <app-conversation-list />
                 <app-bottom-navigation />
             </div>
-            <div [hidden]="viewState.currentView()!=='friendList'">
+            <div [hidden]="viewService.currentView()!=='friendList'">
                 <app-user-status-list />
                 <app-bottom-navigation />
             </div>
-            <div [hidden]="viewState.currentView()!=='chatWindow'">
+            <div [hidden]="viewService.currentView()!=='chatWindow'">
               <app-chat-window />
             </div>
           </div>
@@ -64,12 +64,12 @@ import { Title } from '@angular/platform-browser';
 })
 export class ChatComponent {
   store = inject(ChatStore);
-  viewState = inject(ViewStateService);
+  viewService = inject(ViewService);
   title = inject(Title);
 
   intervalId = 0;
   unreadMessagesEffect = effect(() => {
-    const isMobile = this.viewState.isMobile();
+    const isMobile = this.viewService.isMobile();
     if(isMobile){
       this.clearInterval();
       return;
