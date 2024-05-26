@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Injectable, ViewRef, computed, effect, inject, signal } from '@angular/core';
+import { ChangeDetectorRef, Injectable, Signal, ViewRef, computed, effect, inject, signal } from '@angular/core';
 import { BehaviorSubject, Observable, Subscription, debounceTime, fromEvent, map, pairwise, startWith } from 'rxjs';
 
 type View = 'friendList' | 'chatList' | 'chatWindow';
@@ -19,8 +19,9 @@ export class ViewService {
   resizeObservable$!: Observable<Event>;
   resizeSubscription$!: Subscription;
 
-  innerWidth = signal(window.innerWidth);
+  isRaelMobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(navigator.userAgent.toLowerCase());
 
+  innerWidth = signal(window.innerWidth);
   isMobile = computed(() => {
     const innerWidth = this.innerWidth();
     const userAgent = navigator.userAgent.toLowerCase();
@@ -53,7 +54,7 @@ export class ViewService {
       )
       .subscribe((event: any) => {
         this.innerWidth.set(event?.target?.innerWidth);
-      })
+      });
   }
 
   getCurrentView$() {

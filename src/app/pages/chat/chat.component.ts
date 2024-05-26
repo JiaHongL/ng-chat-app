@@ -44,14 +44,17 @@ import { Title } from '@angular/platform-browser';
     >
       <div class="flex flex-col w-screen bg-white rounded-lg shadow-lg">
           <div class="w-screen margin-2">
-            <div [hidden]="viewService.currentView()!=='chatList'">
-                <app-conversation-list />
-                <app-bottom-navigation />
-            </div>
+            <!-- 好友頁 -->
             <div [hidden]="viewService.currentView()!=='friendList'">
                 <app-user-status-list />
                 <app-bottom-navigation />
             </div>
+            <!-- 通知訊息頁 -->
+            <div [hidden]="viewService.currentView()!=='chatList'">
+                <app-conversation-list />
+                <app-bottom-navigation />
+            </div>
+            <!-- 對話頁面 -->
             <div [hidden]="viewService.currentView()!=='chatWindow'">
               <app-chat-window />
             </div>

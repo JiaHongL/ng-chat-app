@@ -121,29 +121,32 @@ import { PickerComponent } from '@ctrl/ngx-emoji-mart';
 })
 export class ChatWindowComponent {
   @HostBinding('class') class = 'relative pl-0 sm:pl-3 flex-1 flex flex-col min-w-[250px] sm:h-auto';
+
   store = inject(ChatStore);
+  viewService = inject(ViewService);
+
   chatBox = viewChild<ElementRef<HTMLDivElement>>('chatBox');
   message = signal<string>('');
-  viewService = inject(ViewService);
 
   dynamicHeight = signal({
     height: 'calc(100vh - 180px)'
   });
+
   isShowEmojiMart = signal<boolean>(false);
+  
   textArea = viewChild<ElementRef<HTMLTextAreaElement>>('textArea');
   cursorStart = 0;
   cursorEnd = 0;
 
   constructor() {
-    const userAgent = navigator.userAgent.toLowerCase();
-    const isMobileDevice = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent);
-    if(isMobileDevice){
+    if(this.viewService.isRaelMobile){
       this.dynamicHeight.set({
         height: 'calc(100vh - 290px)'
       });
     }
-    this.viewService.getCurrentView$().subscribe((view) => {
-      if(view === 'chatWindow'){
+    effect(() => {
+      const currentView = this.viewService.currentView();
+      if(currentView === 'chatWindow'){
         this.chatBoxScrollToBottom();
       }
     });
@@ -192,18 +195,22 @@ export class ChatWindowComponent {
       return;
     }
 
+    // 如果是在 general 房間，且有未讀訊息，就標記已讀
     if(
       room === 'general'&& 
       unreadCounts[room] > 0
     ){
       this.store.markGeneralAsRead();
     }
+    
+    // 如果是在私人房間，且有未讀訊息，就標記已讀
     if(
       room !== 'general' && 
       unreadCounts[receiveRoom] > 0
     ){
       this.store.markPrivateAsRead(receiveRoom);
     }
+
   });
 
   sendMessage(event?:Event){
