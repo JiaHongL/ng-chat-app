@@ -69,7 +69,12 @@ import { UserService } from './../../../services/user.service';
 							</div>
 							<span class="absolute top-2 right-2 text-blue-500 text-sm">{{ store.messageNotifications().general.lastMessage.date | date: 'HH:mm'  }}</span>
 							@if(store.messageNotifications().general.unreadCount){
-								<span class="absolute top-6 right-2 mt-1 mr-1 bg-red-500 text-white text-xs font-semibold w-5 h-5 flex items-center justify-center rounded-full">{{ store.messageNotifications().general.unreadCount }}</span>
+								<span 
+									class="absolute top-6 right-2 mt-1 mr-1 bg-red-500 text-white text-xs font-semibold w-5 h-5 flex items-center justify-center rounded-full"
+									[ngClass]="{ 
+										'w-7': store.messageNotifications().general.unreadCount > 99, 
+          							}" 
+								>{{ store.messageNotifications().general.unreadCount }}</span>
 							}
 						</div>
 			</div>
@@ -111,7 +116,12 @@ import { UserService } from './../../../services/user.service';
 											</div>
 											<span class="absolute top-2 right-2 text-blue-500 text-sm">{{ user?.lastMessage?.date | date: 'HH:mm' }}</span>
 											@if(user?.unreadCount){
-												<span class="absolute top-6 right-2 mt-1 mr-1 bg-red-500 text-white text-xs font-semibold w-5 h-5 flex items-center justify-center rounded-full">{{ user?.unreadCount }}</span>
+												<span 
+													class="absolute top-6 right-2 mt-1 mr-1 bg-red-500 text-white text-xs font-semibold w-5 h-5 flex items-center justify-center rounded-full"
+													[ngClass]="{ 
+														'w-7': user?.unreadCount ?? 0 > 99,
+          											}" 
+												>{{ user?.unreadCount }}</span>
 											}
 									</div>
 							</div>

@@ -174,7 +174,6 @@ export const ChatStore = signalStore(
         console.log('=>>> Received message:', message);
         switch (message.event) {
           case 'initializationComplete': // 是第一次連線成功後的回應(接收完相關初始化資料)
-            patchState(store, { isSocketStable: true });
             console.log('Initialization complete', getState(store));
             break;
           case 'onlineUsers':
@@ -187,6 +186,7 @@ export const ChatStore = signalStore(
                 }
               }) as User[]
             });
+            patchState(store, { isSocketStable: true });
             break;
           case 'messageHistory':
             if (message.data.room === 'general') {

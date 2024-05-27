@@ -39,7 +39,7 @@ export interface ChatState {
 export const initialState: ChatState = {
     isSocketStable: false,
     userInfo: null,
-    currentRoom: 'general', // 默認聊天室
+    currentRoom: '',
     users: [],
     generalMessages: [],
     privateMessages: [],

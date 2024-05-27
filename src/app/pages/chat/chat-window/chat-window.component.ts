@@ -33,18 +33,25 @@ import { Dialog } from '@angular/cdk/dialog';
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
             </svg>
         </button>
-        <div class="block sm:hidden bg-red-500 text-white rounded-full w-4 h-4 text-xs flex items-center justify-center" *ngIf="store.allUnreadCount() > 0">
+        <div 
+          class="block sm:hidden bg-red-500 text-white rounded-full w-4 h-4 text-xs flex items-center justify-center"
+          [ngClass]="{ 
+            'w-7': store.allUnreadCount() > 99, 
+          }" 
+          *ngIf="store.allUnreadCount() > 0"
+        >
           {{ store.allUnreadCount() }}
         </div>
     </div>
-    <div class="relative">
-      <img class="w-10 h-10 rounded-full mr-2" [src]="currentChatPartnerAvatarUrl()" alt="Profile Image">
-      @if(store.currentChatPartner()?.status === 'online'){
-        <span class="absolute bottom-0 right-3 bg-green-400 w-2 h-2 rounded-full"></span>
-      }@else {
-        <span class="absolute bottom-0 right-3 bg-gray-500 w-2 h-2 rounded-full"></span>
+    <div class="relative h-10">
+      @if(store.currentChatPartner()?.username){
+        <img class="w-10 h-10 rounded-full mr-2" [src]="currentChatPartnerAvatarUrl()" alt="Profile Image">
+        @if(store.currentChatPartner()?.status === 'online'){
+          <span class="absolute bottom-0 right-3 bg-green-400 w-2 h-2 rounded-full"></span>
+        }@else {
+          <span class="absolute bottom-0 right-3 bg-gray-500 w-2 h-2 rounded-full"></span>
+        }
       }
-
     </div>
     <div>
       <div class="flex items-center font-semibold">
@@ -130,23 +137,33 @@ import { Dialog } from '@angular/cdk/dialog';
     <div class="flex items-center">
       <textarea 
         #textArea
+        [disabled]="!store.currentChatPartner()?.username"
         [(ngModel)]="message"
         placeholder="Type Your Message Here" 
-        class="w-full p-2 rounded-lg bg-gray-100 shadow-inner focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" 
+        class="w-full p-2 rounded-lg bg-gray-100 shadow-inner focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none disabled:opacity-50 disabled:cursor-not-allowed" 
         rows="2" 
         style="line-height: 1.5;"
         (focus)="saveSelection()" 
         (blur)="saveSelection();viewService.resetScroll()"
         (keydown.enter)="sendMessage($event)"
       ></textarea>
-      <button class="ml-2 bg-blue-500 text-white rounded-full w-10 h-10 flex items-center justify-center" (click)="sendMessage()">
+      <button
+        [disabled]="!store.currentChatPartner()?.username"
+        class="ml-2 bg-blue-500 text-white rounded-full w-11 h-10 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed" 
+        (click)="sendMessage()"
+      >
         <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
           <path d="M2 21l21-9-21-9v7l15 2-15 2v7z"></path>
         </svg>
       </button>
-      <div class="hidden sm:block p-2 text-4xl cursor-pointer" (click)="isShowEmojiMart.set(!isShowEmojiMart())">
+      <button
+        [disabled]="!store.currentChatPartner()?.username" 
+        class="hidden sm:block p-2 text-4xl cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed" 
+        (click)="isShowEmojiMart.set(!isShowEmojiMart())"
+      >
         😀
-      </div>
+      </button>
+      
       <app-image-upload />
     </div>
   </div>
