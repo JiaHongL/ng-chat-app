@@ -44,7 +44,7 @@ import { NotificationDialogComponent } from '../../shared/components/notificatio
         </div>
         <div class="flex justify-center">
           <button 
-            type="button"
+            type="submit"
             class="py-2 px-4 bg-blue-500 text-white rounded-lg disabled:opacity-50 hover:bg-blue-600 hover:transition hover:duration-200" 
             [disabled]="loginForm.invalid"
             (click)="login()"
