@@ -101,11 +101,11 @@ import { UserService } from './../../../services/user.service';
 													<div class="font-semibold max-w-[85%] sm:max-w-[110px] text-nowrap overflow-hidden text-ellipsis">{{ user.username | appSafeHtml }}</div>
 													<div class="w-4/5 text-gray-500 text-sm whitespace-nowrap overflow-hidden overflow-ellipsis">
 														@if(
-															store.messageNotifications().general.lastMessage.message.includes('data:image')
+															user.lastMessage.message.includes('data:image')
 														){
-															{{store.messageNotifications().general.lastMessage.sender === store.userInfo()?.username ? 'You' : store.messageNotifications().general.lastMessage.sender}} sent a photo.
+															{{ user.lastMessage.sender === store.userInfo()?.username ? 'You' : user.lastMessage.sender}} sent a photo.
 														}@else {
-															{{ store.messageNotifications().general.lastMessage.message | appSafeHtml }}
+															{{ user.lastMessage.message | appSafeHtml }}
 														}
 													</div>
 											</div>
