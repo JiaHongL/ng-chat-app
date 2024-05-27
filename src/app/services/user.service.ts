@@ -39,14 +39,6 @@ export class UserService {
     this.router.navigate(['/login']);
   }
 
-  resetData(){
-    this.http.get(this.prefixUrl + '/reset').subscribe(()=>{
-      this.token.set('');
-      this.store.reset();
-      this.router.navigate(['/login']);
-    });
-  }
-
   register(data: {
     username: string,
     password: string
