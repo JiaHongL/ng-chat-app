@@ -35,7 +35,7 @@ import { Subject, interval, map, startWith, takeUntil, tap } from 'rxjs';
           <!-- Sidebar -->
           <app-conversation-list />
           <!-- Chat area -->
-          <app-chat-window />
+          <app-chat-window usageContext="desktop" />
           <!-- Online/Offline users list -->
           <app-user-status-list />
       </div>
@@ -60,7 +60,7 @@ import { Subject, interval, map, startWith, takeUntil, tap } from 'rxjs';
             </div>
             <!-- 對話頁面 -->
             <div [hidden]="viewService.currentView()!=='chatWindow'">
-              <app-chat-window />
+              <app-chat-window usageContext="mobile" />
             </div>
           </div>
       </div>
@@ -80,6 +80,7 @@ export class ChatComponent implements OnDestroy {
     const count = this.store.allUnreadCount();
 
     if (this.viewService.isRaelMobile) { return; }
+    this.destroy$.next();
 
     if (count > 0) {
       interval(700).pipe(

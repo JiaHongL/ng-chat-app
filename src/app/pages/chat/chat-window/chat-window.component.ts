@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, ElementRef, HostBinding, computed, effect, inject, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, HostBinding, computed, effect, inject, input, signal, viewChild } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -64,24 +64,36 @@ import { PickerComponent } from '@ctrl/ngx-emoji-mart';
   >
     <!-- Repeat similar message blocks for chat messages -->
     @for (message of store.currentChatMessages(); track message.room) {
-
-      @if(message.sender === store.userInfo()?.username){
+      
+      @if(message.sender === store.userInfo()?.username){ 
+        <!-- 自己傳的訊息 -->
         <div class="flex justify-end mb-4">
-          <div>
-            <div class="bg-blue-500 text-white p-2 rounded-lg ml-10 whitespace-pre-wrap" [innerHTML]="message.message"></div>
-            <div class="text-right text-xs text-gray-500 mt-1">
-              {{ message.date | date: 'HH:mm' }}
+          <div class="flex ml-10">
+            <div class="flex flex-col justify-end text-right text-xs text-gray-500 mt-1">
+              @if(message.isRead){
+                <span class="text-[10px] fon-size text-green-500">Read</span>
+              }
+              @if(message && message.readCount && message.readCount > 0){
+                <span class="text-[10px] text-green-500 text-nowrap">Read {{message.readCount}} </span>
+              }
+              <div>
+                {{ message.date | date: 'HH:mm' }}
+              </div>
             </div>
+            <div class="ml-1 bg-blue-500 text-white p-2 rounded-lg whitespace-pre-wrap" [innerHTML]="message.message"></div>
           </div>
         </div>
       }@else{
+        <!-- 別人傳的訊息 -->
         <div class="mb-4">
           <div class="flex items-center mb-2">
             <img class="w-6 h-6 rounded-full mr-2" src="https://api.dicebear.com/8.x/pixel-art/svg?seed={{message.sender}}" alt="Profile Image">
             <div class="text-sm font-semibold">{{ message.sender }}</div>
           </div>
-          <div class="w-fit bg-gray-200 p-2 rounded-lg mr-8 whitespace-pre-wrap" [innerHTML]="message.message"></div>
-          <div class="text-left text-xs text-gray-500 mt-1">{{ message.date | date: 'HH:mm' }}</div>
+          <div class="mr-8 flex">
+            <div class="mr-1 w-fit bg-gray-200 p-2 rounded-lg whitespace-pre-wrap" [innerHTML]="message.message"></div>
+            <div class="self-end text-left text-xs text-gray-500 mt-1">{{ message.date | date: 'HH:mm' }}</div>
+          </div>
         </div>
       }
 
@@ -122,6 +134,8 @@ import { PickerComponent } from '@ctrl/ngx-emoji-mart';
 export class ChatWindowComponent {
   @HostBinding('class') class = 'relative pl-0 sm:pl-3 flex-1 flex flex-col min-w-[250px] sm:h-auto';
 
+  usageContext = input.required<'desktop'|'mobile'>();
+
   store = inject(ChatStore);
   viewService = inject(ViewService);
 
@@ -133,20 +147,20 @@ export class ChatWindowComponent {
   });
 
   isShowEmojiMart = signal<boolean>(false);
-  
+
   textArea = viewChild<ElementRef<HTMLTextAreaElement>>('textArea');
   cursorStart = 0;
   cursorEnd = 0;
 
   constructor() {
-    if(this.viewService.isRaelMobile){
+    if (this.viewService.isRaelMobile) {
       this.dynamicHeight.set({
         height: 'calc(100vh - 290px)'
       });
     }
     effect(() => {
       const currentView = this.viewService.currentView();
-      if(currentView === 'chatWindow'){
+      if (currentView === 'chatWindow') {
         this.chatBoxScrollToBottom();
       }
     });
@@ -154,16 +168,16 @@ export class ChatWindowComponent {
 
   currentChatPartnerAvatarUrl = computed(() => {
     const partner = this.store.currentChatPartner();
-    if(partner?.username === 'general'){
+    if (partner?.username === 'general') {
       return 'https://api.dicebear.com/8.x/initials/svg?seed=General';
-    }else{
+    } else {
       return `https://api.dicebear.com/8.x/pixel-art/svg?seed=${this.store.currentChatPartner()?.username}`;
     }
   });
 
   chatPartnerChangeEffect = effect(() => {
     const chatPartner = this.store.currentChatPartner();
-    if(chatPartner){
+    if (chatPartner) {
       setTimeout(() => {
         this.chatBoxScrollToBottom();
         this.isShowEmojiMart.set(false);
@@ -173,7 +187,7 @@ export class ChatWindowComponent {
 
   currentChatMessagesChangeEffect = effect(() => {
     const currentChatMessages = this.store.currentChatMessages();
-    if(currentChatMessages){
+    if (currentChatMessages) {
       this.chatBoxScrollToBottom();
     }
   });
@@ -183,45 +197,55 @@ export class ChatWindowComponent {
     const room = this.store.currentRoom();
     const currentView = this.viewService.currentView();
     const isMobile = this.viewService.isMobile();
+    const usageContext = this.usageContext();
 
     // 已讀私人訊息的房間(別人傳來的訊息)，名稱為 `private_${對方的使用者名稱}_${自己的使用者名稱}`，就是已讀對方傳送的訊息
     const receiveRoom = `private_${this.store.currentChatPartner()?.username}_${this.store.userInfo()?.username}`;
 
     // 如果是手機裝置，且當前視圖不是聊天視圖，就不標記已讀
-    if(
+    if (
       isMobile &&
       currentView !== 'chatWindow'
-    ){
+    ) {
       return;
     }
 
     // 如果是在 general 房間，且有未讀訊息，就標記已讀
-    if(
-      room === 'general'&& 
+    if (
+      room === 'general' &&
       unreadCounts[room] > 0
-    ){
+    ) {
       this.store.markGeneralAsRead();
+      return;
     }
-    
+
     // 如果是在私人房間，且有未讀訊息，就標記已讀
-    if(
-      room !== 'general' && 
-      unreadCounts[receiveRoom] > 0
-    ){
+    if (
+      (
+        isMobile &&  usageContext =='mobile' &&
+        room !== 'general' &&
+        unreadCounts[receiveRoom] > 0
+      )||
+      (
+        !isMobile && usageContext =='desktop' &&
+        room !== 'general' &&
+        unreadCounts[receiveRoom] > 0
+      )
+    ) {
       this.store.markPrivateAsRead(receiveRoom);
     }
 
   });
 
-  sendMessage(event?:Event){
+  sendMessage(event?: Event) {
     const message = this.message();
-    if(event){event.preventDefault();}
-    if((event as KeyboardEvent)?.isComposing || message.trim() === ''){return;}
+    if (event) { event.preventDefault(); }
+    if ((event as KeyboardEvent)?.isComposing || message.trim() === '') { return; }
 
     const room = this.store.currentRoom();
-    if(room === 'general'){
+    if (room === 'general') {
       this.store.sendGeneralMessage(message);
-    }else{
+    } else {
       this.store.sendPrivateMessage(message);
     }
 
@@ -230,7 +254,7 @@ export class ChatWindowComponent {
     this.viewService.resetScroll();
   }
 
-  addEmoji(event:any){
+  addEmoji(event: any) {
     const textAreaElement = this.textArea()?.nativeElement;
     if (textAreaElement) {
       this.insertAtCursor(textAreaElement, event.emoji.native);
@@ -265,7 +289,7 @@ export class ChatWindowComponent {
     });
   }
 
-  chatBoxScrollToBottom(){
+  chatBoxScrollToBottom() {
     setTimeout(() => {
       this.chatBox()?.nativeElement.scrollTo(0, this.chatBox()?.nativeElement.scrollHeight as number);
     });

@@ -1,7 +1,7 @@
 // chat.store.ts
 import { inject, computed } from '@angular/core';
-import { signalStore, withState, withMethods, patchState, withComputed } from '@ngrx/signals';
-import { User, ChatState, initialState, UserInfo, PrivateMessage } from './models';
+import { signalStore, withState, withMethods, patchState, withComputed, getState } from '@ngrx/signals';
+import { User, ChatState, initialState, UserInfo, PrivateMessage, GeneralMessage } from './models';
 
 import { UserService } from '../services/user.service';
 import { firstValueFrom } from 'rxjs';
@@ -10,6 +10,24 @@ import { environment } from '../../environments/environment';
 export const ChatStore = signalStore(
   { providedIn: 'root' },
   withState<ChatState>(initialState),
+  withComputed((store) => ({
+    currentChatPartner: computed(() => {
+      const currentRoom = store.currentRoom();
+      if (currentRoom.startsWith('private_')) {
+        // private_{{sender}}_{{to}}
+        // 登入者為 user01，與 user02 的聊天室名稱為 private_user01_user02 
+        // 左側訊息通知: private_user02_user01，右側聊天室名稱: private_user01_user02，所以會需要判斷 sender 與 to
+        const sender = currentRoom.split('_')[1];
+        const to = currentRoom.split('_')[2];
+        const partnerUsername = sender === store.userInfo()?.username ? to : sender;
+        const user = store.users().find(user => user.username === partnerUsername);
+        return user;
+      }else if(currentRoom === 'general'){
+        return { username: 'general', status: 'online' };
+      }
+      return null;
+    }),
+  })),
   withComputed((store) => ({
     onlineUsers: computed(() => store.users().filter(user => user.status === 'online')),
     offlineUsers: computed(() => store.users().filter(user => user.status === 'offline')),
@@ -58,28 +76,72 @@ export const ChatStore = signalStore(
       });
       return generalUnreadCount + privateUnreadCounts.reduce((acc, count) => acc + count, 0);
     }),
-    currentChatPartner: computed(() => {
-      const currentRoom = store.currentRoom();
-      if (currentRoom.startsWith('private_')) {
-        // private_{{sender}}_{{to}}
-        // 登入者為 user01，與 user02 的聊天室名稱為 private_user01_user02 
-        // 左側訊息通知: private_user02_user01，右側聊天室名稱: private_user01_user02，所以會需要判斷 sender 與 to
-        const sender = currentRoom.split('_')[1];
-        const to = currentRoom.split('_')[2];
-        const partnerUsername = sender === store.userInfo()?.username ? to : sender;
-        const user = store.users().find(user => user.username === partnerUsername);
-        return user;
-      }else if(currentRoom === 'general'){
-        return { username: 'general', status: 'online' };
-      }
-      return null;
-    }),
     currentChatMessages: computed(() => {
+
+      function calculateReadCounts(generalMessages:GeneralMessage[], generalUnReadInfo: { [username: string]: number }) {
+
+        // 如果沒有任何未讀訊息，則所有訊息都已讀
+        if(
+          Object.keys(generalUnReadInfo).length === 0
+        ){
+          return generalMessages.map(() => 0);
+        }
+
+        // 總訊息數
+        const totalMessages = generalMessages.length;
+    
+        // 計算每個用戶已讀的訊息數量
+        const userReadCounts:{
+            [username: string]: number;
+        } = {};
+        for (const user in generalUnReadInfo) {
+            userReadCounts[user] = totalMessages - generalUnReadInfo[user];
+        }
+
+        // 移除自己的已讀訊息數量
+        const currentUser = store.userInfo()?.username;
+        if (currentUser) {
+          delete userReadCounts[currentUser];
+        }
+    
+        // 初始化每條訊息的已讀人數
+        const messageReadCounts = generalMessages.map(() => 0);
+    
+        // 計算每條訊息的已讀人數
+        for (const user in userReadCounts) {
+            const userReadCount = userReadCounts[user];
+            for (let i = 0; i < userReadCount; i++) {
+                messageReadCounts[i]++;
+            }
+        }
+    
+        return messageReadCounts;
+    }
+
       const currentRoom = store.currentRoom();
       if (currentRoom === 'general') {
-        return store.generalMessages() || [];
+        let generalMessages = store.generalMessages() || [];
+        const generalUnReadInfo = store.generalUnReadInfo();
+        const messageReadCounts = calculateReadCounts(generalMessages, generalUnReadInfo);
+        generalMessages = generalMessages.map((msg,i) => {
+          return {
+            ...msg,
+            readCount: messageReadCounts[i]
+          }
+        });
+        return generalMessages || [];
       } else {
-        return store.privateMessages().filter(msg => ( msg.room === currentRoom)) || [];
+        let sender = store.userInfo()?.username;
+        let to = store.currentChatPartner()?.username;
+        let privateMessage = [...store.privateMessages().filter(msg => ( msg.room === currentRoom))] || [];
+        const unreadCount = store.unreadCounts()[`private_${sender}_${to}`] || 0;
+        privateMessage = privateMessage.map((msg,i) => {
+          return {
+            ...msg,
+            isRead: i <= privateMessage.length - unreadCount - 1
+          }
+        });
+        return privateMessage;
       }
     })
   })),
@@ -109,10 +171,11 @@ export const ChatStore = signalStore(
       socket.onopen = () => console.log('Connected to server');
       socket.onmessage = (event) => {
         const message = JSON.parse(event.data);
-        console.log('=>>>Received message:', message);
+        console.log('=>>> Received message:', message);
         switch (message.event) {
           case 'initializationComplete': // 是第一次連線成功後的回應(接收完相關初始化資料)
             patchState(store, { isSocketStable: true });
+            console.log('Initialization complete', getState(store));
             break;
           case 'onlineUsers':
             patchState(store, {
@@ -145,6 +208,9 @@ export const ChatStore = signalStore(
                 [message.data.room]: message.data.count,
               },
             }));
+            break;
+          case 'generalUnReadInfo':
+            patchState(store, { generalUnReadInfo: message.data });
             break;
           case 'updateUserList':
             patchState(store, { users: message.data });
