@@ -6,6 +6,9 @@ import { ViewService } from '../../../services/view.service';
 import { ChatStore } from '../../../store/chat.store';
 
 import { PickerComponent } from '@ctrl/ngx-emoji-mart';
+import { ImageUploadComponent } from '../../../shared/components/image-upload/image-upload.component';
+import { ImagePreviewComponent } from './image-preview/image-preview.component';
+import { Dialog } from '@angular/cdk/dialog';
 
 @Component({
   selector: 'app-chat-window',
@@ -14,7 +17,9 @@ import { PickerComponent } from '@ctrl/ngx-emoji-mart';
     CommonModule,
     DatePipe,
     FormsModule,
-    PickerComponent
+    PickerComponent,
+    ImageUploadComponent,
+    ImagePreviewComponent
   ],
   template: `
   <!-- 頂部 -->
@@ -80,7 +85,18 @@ import { PickerComponent } from '@ctrl/ngx-emoji-mart';
                 {{ message.date | date: 'HH:mm' }}
               </div>
             </div>
-            <div class="ml-1 bg-blue-500 text-white p-2 rounded-lg whitespace-pre-wrap" [innerHTML]="message.message"></div>
+            @if(message.message.includes('data:image')){
+              <div class="ml-1 bg-blue-500 p-2 rounded-lg">
+                <img
+                  (click)="openImagePreview(message.message)"
+                  class="cursor-pointer max-w-[200px] max-w-[200px] ml-auto rounded-lg ml-1" 
+                  [src]="message.message" 
+                  alt="Image"
+                >
+              </div>
+            }@else {
+              <div class="ml-1 bg-blue-500 text-white p-2 rounded-lg whitespace-pre-wrap" [innerHTML]="message.message"></div>
+            }
           </div>
         </div>
       }@else{
@@ -91,12 +107,22 @@ import { PickerComponent } from '@ctrl/ngx-emoji-mart';
             <div class="text-sm font-semibold">{{ message.sender }}</div>
           </div>
           <div class="mr-8 flex">
-            <div class="mr-1 w-fit bg-gray-200 p-2 rounded-lg whitespace-pre-wrap" [innerHTML]="message.message"></div>
+            @if(message.message.includes('data:image')){
+              <div class="mr-1 bg-blue-500 p-2 rounded-lg">
+                <img
+                  (click)="openImagePreview(message.message)" 
+                  class="cursor-pointer max-w-[200px] max-w-[200px] ml-auto rounded-lg ml-1" 
+                  [src]="message.message" 
+                  alt="Image"
+                >
+              </div>
+            }@else {
+              <div class="mr-1 w-fit bg-gray-200 p-2 rounded-lg whitespace-pre-wrap" [innerHTML]="message.message"></div>
+            }
             <div class="self-end text-left text-xs text-gray-500 mt-1">{{ message.date | date: 'HH:mm' }}</div>
           </div>
         </div>
       }
-
     }
   </div>
   <!-- 輸入框 -->
@@ -118,9 +144,7 @@ import { PickerComponent } from '@ctrl/ngx-emoji-mart';
           <path d="M2 21l21-9-21-9v7l15 2-15 2v7z"></path>
         </svg>
       </button>
-      <div class="hidden sm:block p-2 text-4xl cursor-pointer" (click)="isShowEmojiMart.set(!isShowEmojiMart())">
-        😀
-      </div>
+      <app-image-upload />
     </div>
   </div>
   @if(isShowEmojiMart()){
@@ -151,6 +175,8 @@ export class ChatWindowComponent {
   textArea = viewChild<ElementRef<HTMLTextAreaElement>>('textArea');
   cursorStart = 0;
   cursorEnd = 0;
+
+  dialog = inject(Dialog);
 
   constructor() {
     if (this.viewService.isRaelMobile) {
@@ -292,6 +318,14 @@ export class ChatWindowComponent {
   chatBoxScrollToBottom() {
     setTimeout(() => {
       this.chatBox()?.nativeElement.scrollTo(0, this.chatBox()?.nativeElement.scrollHeight as number);
+    });
+  }
+
+  openImagePreview(imageUrl: string) {
+    this.dialog.open(ImagePreviewComponent, {
+      data: {
+        base64String: imageUrl
+      }
     });
   }
 

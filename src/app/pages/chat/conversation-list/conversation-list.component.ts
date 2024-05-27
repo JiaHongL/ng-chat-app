@@ -18,7 +18,7 @@ import { UserService } from './../../../services/user.service';
 	],
 	template: `
 	<h2 class="sm:hidden text-center text-3xl">
-		Chat
+		Chats
 	</h2>
 	<div class="hidden sm:flex items-center mb-4">
 		@if(store.userInfo()?.username ){
@@ -55,7 +55,17 @@ import { UserService } from './../../../services/user.service';
 											({{ store.users().length }})
 										</span>
 									</div>
-									<div class="w-4/5 text-gray-500 text-sm whitespace-nowrap overflow-hidden overflow-ellipsis">{{ store.messageNotifications().general.lastMessage.message | appSafeHtml }}</div>
+									<div class="w-4/5 text-gray-500 text-sm whitespace-nowrap overflow-hidden overflow-ellipsis">
+										@if(
+											store.messageNotifications().general.lastMessage.message.includes('data:image')
+										){
+											{{
+												store.messageNotifications().general.lastMessage.sender === store.userInfo()?.username ? 'You' : store.messageNotifications().general.lastMessage.sender
+											}} sent a photo.
+										}@else {
+											{{ store.messageNotifications().general.lastMessage.message | appSafeHtml }}
+										}
+									</div>
 							</div>
 							<span class="absolute top-2 right-2 text-blue-500 text-sm">{{ store.messageNotifications().general.lastMessage.date | date: 'HH:mm'  }}</span>
 							@if(store.messageNotifications().general.unreadCount){
@@ -89,7 +99,15 @@ import { UserService } from './../../../services/user.service';
 									<div class="flex-grow overflow-hidden">
 											<div>
 													<div class="font-semibold max-w-[85%] sm:max-w-[110px] text-nowrap overflow-hidden text-ellipsis">{{ user.username | appSafeHtml }}</div>
-													<div class="w-4/5 text-gray-500 text-sm whitespace-nowrap overflow-hidden overflow-ellipsis"> {{ user?.lastMessage?.message ?? '' | appSafeHtml  }}</div>
+													<div class="w-4/5 text-gray-500 text-sm whitespace-nowrap overflow-hidden overflow-ellipsis">
+														@if(
+															store.messageNotifications().general.lastMessage.message.includes('data:image')
+														){
+															{{store.messageNotifications().general.lastMessage.sender === store.userInfo()?.username ? 'You' : store.messageNotifications().general.lastMessage.sender}} sent a photo.
+														}@else {
+															{{ store.messageNotifications().general.lastMessage.message | appSafeHtml }}
+														}
+													</div>
 											</div>
 											<span class="absolute top-2 right-2 text-blue-500 text-sm">{{ user?.lastMessage?.date | date: 'HH:mm' }}</span>
 											@if(user?.unreadCount){
