@@ -20,8 +20,9 @@ import { UserService } from './../../../services/user.service';
 	<h2 class="sm:hidden text-center text-3xl">
 		Chats
 	</h2>
+	<!-- 個人資訊 -->
 	<div class="hidden sm:flex items-center mb-4">
-		@if(store.userInfo()?.username ){
+		@if(store.userInfo()?.username){
 			<img class="w-10 h-10 rounded-full mr-2 bg-white" src="https://api.dicebear.com/8.x/pixel-art/svg?seed={{ store.userInfo()?.username }}" alt="Profile Image">
 			<span class="font-semibold text-xl text-gray-900 max-w-[110px] text-nowrap overflow-hidden text-ellipsis">{{ store.userInfo()?.username }}</span>
 		}
@@ -34,7 +35,7 @@ import { UserService } from './../../../services/user.service';
 			</svg>
 		</button>
 	</div>
-
+	<!-- 大廳 -->
 	<h3 class="font-semibold text-sm text-gray-500 mb-1">General</h3>
 	<div class="cursor-pointer mb-2" (click)="store.setCurrentRoom('general');viewService.goToChatView()">
 			<div 
@@ -79,7 +80,7 @@ import { UserService } from './../../../services/user.service';
 						</div>
 			</div>
 	</div>
-
+	<!-- 私人訊息 -->
 	<h3 class="font-semibold text-sm text-gray-500 mb-1">Private Message</h3>
 	<ul class="pb-[250px] sm:pb-0 sm:max-h-73 sm:overflow-scroll custom-scrollbar">
 		<!-- Repeat similar list items for other contacts -->
@@ -106,7 +107,7 @@ import { UserService } from './../../../services/user.service';
 													<div class="font-semibold max-w-[85%] sm:max-w-[110px] text-nowrap overflow-hidden text-ellipsis">{{ user.username | appSafeHtml }}</div>
 													<div class="w-4/5 text-gray-500 text-sm whitespace-nowrap overflow-hidden overflow-ellipsis">
 														@if(
-															user.lastMessage.message.includes('data:image')
+															user?.lastMessage?.message?.includes('data:image')
 														){
 															{{ user.lastMessage.sender === store.userInfo()?.username ? 'You' : user.lastMessage.sender}} sent a photo.
 														}@else {

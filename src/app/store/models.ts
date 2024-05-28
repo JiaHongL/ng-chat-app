@@ -1,16 +1,26 @@
 // models.ts
 export interface GeneralMessage {
+    id: string;
     room: string;
     message: string;
     sender: string;
     date: string;
-    isRead?: boolean; // private 訊息的已讀狀態 (前端自己使用)
-    readCount?: number; // general 訊息的已讀數量 (前端自己使用)
+    isRecalled:boolean;
+    readBy: string[];
 }
 
-export interface PrivateMessage extends GeneralMessage {
+export interface PrivateMessage {
+    id: string;
+    room: string;
+    message: string;
+    sender: string;
     to: string;
+    date: string;
+    isRead: boolean;
+    isRecalled:boolean;
 }
+
+export type RoomMessage = GeneralMessage & PrivateMessage;
 
 export interface User {
     username: string;
@@ -31,9 +41,6 @@ export interface ChatState {
     generalMessages: GeneralMessage[];
     privateMessages: PrivateMessage[];
     unreadCounts: { [room: string]: number };
-    generalUnReadInfo: {
-        [username: string]: number;
-    }
 }
 
 export const initialState: ChatState = {
@@ -44,5 +51,4 @@ export const initialState: ChatState = {
     generalMessages: [],
     privateMessages: [],
     unreadCounts: {}, // 用於存儲各個聊天室的未讀訊息計數
-    generalUnReadInfo: {}
 };

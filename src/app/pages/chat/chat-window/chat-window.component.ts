@@ -79,56 +79,86 @@ import { Dialog } from '@angular/cdk/dialog';
       
       @if(message.sender === store.userInfo()?.username){ 
         <!-- 自己傳的訊息 -->
-        <div class="flex justify-end mb-4">
-          <div class="flex ml-10">
-            <div class="flex flex-col justify-end text-right text-xs text-gray-500 mt-1">
-              @if(message.isRead){
-                <span class="text-[10px] fon-size text-green-500">Read</span>
+        @if(message.isRecalled){
+          <!-- 收回 -->
+          <div class=" flex justify-end mb-4">
+            <div class="bg-gray-100 p-2 rounded-lg mb-2">
+              <p class="text-sm text-gray-500 italic">Message recalled</p>
+              <button class="text-xs text-blue-500 hover:underline" (click)="store.undoRecallMessage(message.room, message.id)">Undo Recall</button>
+            </div>
+          </div>
+        }@else {
+          <!-- 顯示 -->
+          <div class=" flex justify-end mb-4">
+            <div class="group flex ml-10 relative">
+              <div class="flex flex-col justify-end text-right text-xs text-gray-500 mt-1">
+                @if(store.currentChatPartner()?.username !== 'general' && message.isRead){
+                  <span class="text-[10px] fon-size text-green-500">Read</span>
+                }
+                @if(store.currentChatPartner()?.username === 'general' && message?.readBy && message.readBy.length > 1){
+                  <span class="text-[10px] text-green-500 text-nowrap">Read {{ message.readBy.length - 1}} </span>
+                }
+                <div>
+                  {{ message.date | date: 'HH:mm' }}
+                </div>
+              </div>
+              @if(message?.message?.includes('data:image')){
+                <div class="ml-1 bg-blue-500 p-2 rounded-lg">
+                  <img
+                    (click)="openImagePreview(message.message)"
+                    class="cursor-pointer max-w-[200px] max-w-[200px] ml-auto rounded-lg ml-1" 
+                    [src]="message.message" 
+                    alt="Image"
+                  >
+                </div>
+              }@else {
+                <div class="ml-1 bg-blue-500 text-white p-2 rounded-lg whitespace-pre-wrap" [innerHTML]="message.message"></div>
               }
-              @if(message && message.readCount && message.readCount > 0){
-                <span class="text-[10px] text-green-500 text-nowrap">Read {{message.readCount}} </span>
-              }
-              <div>
-                {{ message.date | date: 'HH:mm' }}
+              <div class="hidden group-hover:flex absolute bottom-[4px] right-[4px]">
+                <button class="bg-red-400 rounded-md text-white px-2 py-1" (click)="store.recallMessage(message.room, message.id)">Recall</button>
               </div>
             </div>
-            @if(message.message.includes('data:image')){
-              <div class="ml-1 bg-blue-500 p-2 rounded-lg">
-                <img
-                  (click)="openImagePreview(message.message)"
-                  class="cursor-pointer max-w-[200px] max-w-[200px] ml-auto rounded-lg ml-1" 
-                  [src]="message.message" 
-                  alt="Image"
-                >
-              </div>
-            }@else {
-              <div class="ml-1 bg-blue-500 text-white p-2 rounded-lg whitespace-pre-wrap" [innerHTML]="message.message"></div>
-            }
           </div>
-        </div>
+        }
       }@else{
         <!-- 別人傳的訊息 -->
-        <div class="mb-4">
-          <div class="flex items-center mb-2">
-            <img class="w-6 h-6 rounded-full mr-2" src="https://api.dicebear.com/8.x/pixel-art/svg?seed={{message.sender}}" alt="Profile Image">
-            <div class="text-sm font-semibold">{{ message.sender }}</div>
+        @if(message.isRecalled){
+          <!-- 收回 -->
+          @if(store.currentChatPartner()?.username === 'general'){
+            <div class="flex items-center mb-2">
+              <img class="w-6 h-6 rounded-full mr-2" src="https://api.dicebear.com/8.x/pixel-art/svg?seed={{message.sender}}" alt="Profile Image">
+              <div class="text-sm font-semibold">{{ message.sender }}</div>
+            </div>
+          }
+          <div class=" flex justify-start mb-4">
+            <div class="bg-gray-100 p-2 rounded-lg mb-2">
+              <p class="text-sm text-gray-500 italic" id="recalledMessageText"> Message recalled</p>
+            </div>
           </div>
-          <div class="mr-8 flex">
-            @if(message.message.includes('data:image')){
-              <div class="mr-1 bg-blue-500 p-2 rounded-lg">
-                <img
-                  (click)="openImagePreview(message.message)" 
-                  class="cursor-pointer max-w-[200px] max-w-[200px] ml-auto rounded-lg ml-1" 
-                  [src]="message.message" 
-                  alt="Image"
-                >
-              </div>
-            }@else {
-              <div class="mr-1 w-fit bg-gray-200 p-2 rounded-lg whitespace-pre-wrap" [innerHTML]="message.message"></div>
-            }
-            <div class="self-end text-left text-xs text-gray-500 mt-1">{{ message.date | date: 'HH:mm' }}</div>
+        }@else{
+          <!-- 顯示 -->
+          <div class="mb-4">
+            <div class="flex items-center mb-2">
+              <img class="w-6 h-6 rounded-full mr-2" src="https://api.dicebear.com/8.x/pixel-art/svg?seed={{message.sender}}" alt="Profile Image">
+              <div class="text-sm font-semibold">{{ message.sender }}</div>
+            </div>
+            <div class="mr-8 flex">
+              @if(message?.message?.includes('data:image')){
+                <div class="mr-1 bg-blue-500 p-2 rounded-lg">
+                  <img
+                    (click)="openImagePreview(message.message)" 
+                    class="cursor-pointer max-w-[200px] max-w-[200px] ml-auto rounded-lg ml-1" 
+                    [src]="message.message" 
+                    alt="Image"
+                  >
+                </div>
+              }@else {
+                <div class="mr-1 w-fit bg-gray-200 p-2 rounded-lg whitespace-pre-wrap" [innerHTML]="message.message"></div>
+              }
+              <div class="self-end text-left text-xs text-gray-500 mt-1">{{ message.date | date: 'HH:mm' }}</div>
+            </div>
           </div>
-        </div>
+        }
       }
     }
   </div>
@@ -244,6 +274,11 @@ export class ChatWindowComponent {
     const currentView = this.viewService.currentView();
     const isMobile = this.viewService.isMobile();
     const usageContext = this.usageContext();
+    const currentChatPartnerUsername = this.store.currentChatPartner()?.username as string;
+
+    if(!currentChatPartnerUsername){
+      return;
+    }
 
     // 已讀私人訊息的房間(別人傳來的訊息)，名稱為 `private_${對方的使用者名稱}_${自己的使用者名稱}`，就是已讀對方傳送的訊息
     const receiveRoom = `private_${this.store.currentChatPartner()?.username}_${this.store.userInfo()?.username}`;
@@ -259,7 +294,7 @@ export class ChatWindowComponent {
     // 如果是在 general 房間，且有未讀訊息，就標記已讀
     if (
       room === 'general' &&
-      unreadCounts[room] > 0
+      unreadCounts['general'] > 0
     ) {
       this.store.markGeneralAsRead();
       return;

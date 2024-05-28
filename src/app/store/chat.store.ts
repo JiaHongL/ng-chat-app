@@ -1,7 +1,7 @@
 // chat.store.ts
 import { inject, computed } from '@angular/core';
 import { signalStore, withState, withMethods, patchState, withComputed, getState } from '@ngrx/signals';
-import { User, ChatState, initialState, UserInfo, PrivateMessage, GeneralMessage } from './models';
+import { User, ChatState, initialState, UserInfo, PrivateMessage, GeneralMessage, RoomMessage } from './models';
 
 import { UserService } from '../services/user.service';
 import { firstValueFrom } from 'rxjs';
@@ -34,14 +34,14 @@ export const ChatStore = signalStore(
     messageNotifications: computed(() => {
 
       const generalUnreadCount = store.unreadCounts()['general'] || 0;
-      const generalLastMessage = store.generalMessages().slice(-1)[0];
+      const generalLastMessage = store.generalMessages().filter(msg => !msg.isRecalled).slice(-1)[0];
 
       let privateUnreadCounts = store.users().map(user => {
         const username = user.username;
         const status = user.status;
         const room = `private_${username}_${store.userInfo()?.username}`; // 收訊者為登入者的聊天室名稱
         let unreadCount = store.unreadCounts()[room] || 0;
-        let lastMessage: PrivateMessage = store.privateMessages().filter(msg => msg.room === room).slice(-1)[0];
+        let lastMessage: PrivateMessage = store.privateMessages().filter(msg => msg.room === room && !msg.isRecalled ).slice(-1)[0];
         return {
           username,
           room,
@@ -68,80 +68,26 @@ export const ChatStore = signalStore(
 
     }),
     allUnreadCount: computed(() => {
-      const generalUnreadCount = store.unreadCounts()['general'] || 0;
-      const privateUnreadCounts = store.users().map(user => {
-        const username = user.username;
-        const room = `private_${username}_${store.userInfo()?.username}`;
-        return store.unreadCounts()[room] || 0;
-      });
-      return generalUnreadCount + privateUnreadCounts.reduce((acc, count) => acc + count, 0);
+      const users = store.users();
+      const userInfo = store.userInfo();
+      const unreadCounts = store.unreadCounts();
+
+      const generalUnreadCount = unreadCounts['general'] || 0;
+      const privateUnreadCount = users.reduce((acc, user) => {
+        const room = `private_${user.username}_${userInfo?.username}`;
+        const count = unreadCounts[room] || 0;
+        return acc + count;
+      }, 0);
+      return generalUnreadCount + privateUnreadCount;
     }),
-    currentChatMessages: computed(() => {
-
-      function calculateReadCounts(generalMessages:GeneralMessage[], generalUnReadInfo: { [username: string]: number }) {
-
-        // 如果沒有任何未讀訊息，則所有訊息都已讀
-        if(
-          Object.keys(generalUnReadInfo).length === 0
-        ){
-          return generalMessages.map(() => 0);
-        }
-
-        // 總訊息數
-        const totalMessages = generalMessages.length;
-    
-        // 計算每個用戶已讀的訊息數量
-        const userReadCounts:{
-            [username: string]: number;
-        } = {};
-        for (const user in generalUnReadInfo) {
-            userReadCounts[user] = totalMessages - generalUnReadInfo[user];
-        }
-
-        // 移除自己的已讀訊息數量
-        const currentUser = store.userInfo()?.username;
-        if (currentUser) {
-          delete userReadCounts[currentUser];
-        }
-    
-        // 初始化每條訊息的已讀人數
-        const messageReadCounts = generalMessages.map(() => 0);
-    
-        // 計算每條訊息的已讀人數
-        for (const user in userReadCounts) {
-            const userReadCount = userReadCounts[user];
-            for (let i = 0; i < userReadCount; i++) {
-                messageReadCounts[i]++;
-            }
-        }
-    
-        return messageReadCounts;
-    }
-
+    currentChatMessages: computed<RoomMessage[]>(() => {
       const currentRoom = store.currentRoom();
       if (currentRoom === 'general') {
         let generalMessages = store.generalMessages() || [];
-        const generalUnReadInfo = store.generalUnReadInfo();
-        const messageReadCounts = calculateReadCounts(generalMessages, generalUnReadInfo);
-        generalMessages = generalMessages.map((msg,i) => {
-          return {
-            ...msg,
-            readCount: messageReadCounts[i]
-          }
-        });
-        return generalMessages || [];
+        return generalMessages as RoomMessage[];
       } else {
-        let sender = store.userInfo()?.username;
-        let to = store.currentChatPartner()?.username;
         let privateMessage = [...store.privateMessages().filter(msg => ( msg.room === currentRoom))] || [];
-        const unreadCount = store.unreadCounts()[`private_${sender}_${to}`] || 0;
-        privateMessage = privateMessage.map((msg,i) => {
-          return {
-            ...msg,
-            isRead: i <= privateMessage.length - unreadCount - 1
-          }
-        });
-        return privateMessage;
+        return privateMessage as RoomMessage[];
       }
     })
   })),
@@ -171,10 +117,10 @@ export const ChatStore = signalStore(
       socket.onopen = () => console.log('Connected to server');
       socket.onmessage = (event) => {
         const message = JSON.parse(event.data);
-        console.log('=>>> Received message:', message);
+        console.log('=>>> Received message：', message);
         switch (message.event) {
           case 'initializationComplete': // 是第一次連線成功後的回應(接收完相關初始化資料)
-            console.log('Initialization complete', getState(store));
+            console.log('Initialization complete, ChatStore：', getState(store));
             break;
           case 'onlineUsers':
             patchState(store, {
@@ -209,12 +155,80 @@ export const ChatStore = signalStore(
               },
             }));
             break;
-          case 'generalUnReadInfo':
-            patchState(store, { generalUnReadInfo: message.data });
-            break;
           case 'updateUserList':
             patchState(store, { users: message.data });
             break;
+          case 'messageRecalled':
+            patchState(store, {
+              generalMessages: store.generalMessages().map(msg => {
+                if (msg.id === message.data.id) {
+                  return {
+                    ...message.data
+                  };
+                }
+                return msg;
+              }),
+              privateMessages: store.privateMessages().map(msg => {
+                console.log(msg,message);
+                if (msg.id === message.data.id && msg.room === message.data.room) {
+                  return {
+                    ...message.data
+                  };
+                }
+                return msg;
+              }),
+            });
+            break;
+          case 'messageUndoRecalled':
+            patchState(store, {
+              generalMessages: store.generalMessages().map(msg => {
+                if (msg.id === message.data.id) {
+                  return {
+                    ...message.data
+                  };
+                }
+                return msg;
+              }),
+              privateMessages: store.privateMessages().map(msg => {
+                if (msg.id === message.data.id && msg.room === message.data.room) {
+                  return {
+                    ...message.data
+                  };
+                }
+                return msg;
+              }),
+            });
+            console.log('store', getState(store));
+          break;
+          case 'privateMessageRead':
+            patchState(store, {
+              privateMessages: store.privateMessages().map(msg => {
+                if (msg.room === message.data.room) {
+                  return {
+                    ...msg,
+                    isRead: true,
+                  };
+                }
+                return msg;
+              }),
+            });
+            break;
+          case 'messagesReadByUpdated':
+            patchState(store, {
+              generalMessages: store.generalMessages().map(msg => {
+                const findUpdated = message.data.find((data:{id:string}) => data.id === msg.id);
+                if (findUpdated) {
+                  return {
+                    ...msg,
+                    readBy: findUpdated.readBy,
+                  };
+                }
+                return msg;
+              }),
+            });
+            break;
+          default:
+            break
         }
       };
 
@@ -267,6 +281,7 @@ export const ChatStore = signalStore(
           "data": {
               "room": room,
               "type": type,
+              "reader": store.userInfo()?.username,
           }
       }));
     }
@@ -283,6 +298,30 @@ export const ChatStore = signalStore(
       patchState(store, initialState);
     }
 
+    const recallMessage = (room: string, id: any) =>{
+      if (!socket) {return}
+        socket.send(JSON.stringify({
+          "event": "recallMessage",
+          "data": {
+              "room": room,
+              "id": id,
+              "reader": store.userInfo()?.username,
+          }
+      }));
+    };
+
+    const undoRecallMessage = (room: string, id: any) =>{
+      if (!socket) {return}
+        socket.send(JSON.stringify({
+          "event": "undoRecallMessage",
+          "data": {
+              "room": room,
+              "id": id,
+              "reader": store.userInfo()?.username,
+          }
+      }));
+    };
+
     return {
       connectWebSocket,
       disconnectWebSocket,
@@ -293,7 +332,9 @@ export const ChatStore = signalStore(
       markGeneralAsRead,
       sendPrivateMessage,
       markPrivateAsRead,
-      reset
+      reset,
+      recallMessage,
+      undoRecallMessage,
     };
   })
 );
