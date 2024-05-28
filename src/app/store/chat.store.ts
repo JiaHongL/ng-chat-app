@@ -169,7 +169,6 @@ export const ChatStore = signalStore(
                 return msg;
               }),
               privateMessages: store.privateMessages().map(msg => {
-                console.log(msg,message);
                 if (msg.id === message.data.id && msg.room === message.data.room) {
                   return {
                     ...message.data
@@ -198,7 +197,6 @@ export const ChatStore = signalStore(
                 return msg;
               }),
             });
-            console.log('store', getState(store));
           break;
           case 'privateMessageRead':
             patchState(store, {
