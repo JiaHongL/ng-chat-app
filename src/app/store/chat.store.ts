@@ -304,8 +304,7 @@ export const ChatStore = signalStore(
           "event": "recallMessage",
           "data": {
               "room": room,
-              "id": id,
-              "reader": store.userInfo()?.username,
+              "id": id
           }
       }));
     };
@@ -316,8 +315,7 @@ export const ChatStore = signalStore(
           "event": "undoRecallMessage",
           "data": {
               "room": room,
-              "id": id,
-              "reader": store.userInfo()?.username,
+              "id": id
           }
       }));
     };
