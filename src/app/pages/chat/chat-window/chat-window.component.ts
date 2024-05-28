@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, ElementRef, HostBinding, computed, effect, inject, input, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, HostBinding, computed, effect, inject, input, signal, viewChild, untracked} from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -263,7 +263,11 @@ export class ChatWindowComponent {
 
   currentChatMessagesChangeEffect = effect(() => {
     const currentChatMessages = this.store.currentChatMessages();
-    if (currentChatMessages) {
+    const isAutoScrollEnabled = untracked(()=> this.store.isAutoScrollEnabled());
+    if (
+      isAutoScrollEnabled &&
+      currentChatMessages 
+    ) {
       this.chatBoxScrollToBottom();
     }
   });

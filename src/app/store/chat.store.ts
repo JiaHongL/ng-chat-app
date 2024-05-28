@@ -1,15 +1,19 @@
 // chat.store.ts
 import { inject, computed } from '@angular/core';
 import { signalStore, withState, withMethods, patchState, withComputed, getState } from '@ngrx/signals';
-import { User, ChatState, initialState, UserInfo, PrivateMessage, GeneralMessage, RoomMessage } from './models';
+import { User, ChatState, initialState, UserInfo, PrivateMessage, RoomMessage } from './models';
+
+import { environment } from '../../environments/environment';
 
 import { UserService } from '../services/user.service';
+import { withAutoScroll } from './auto-scroll.feature';
+
 import { firstValueFrom } from 'rxjs';
-import { environment } from '../../environments/environment';
 
 export const ChatStore = signalStore(
   { providedIn: 'root' },
   withState<ChatState>(initialState),
+  withAutoScroll(),
   withComputed((store) => ({
     currentChatPartner: computed(() => {
       const currentRoom = store.currentRoom();
@@ -156,7 +160,9 @@ export const ChatStore = signalStore(
             }));
             break;
           case 'updateUserList':
+            store.disableAutoScroll();
             patchState(store, { users: message.data });
+            store.enableAutoScroll();
             break;
           case 'messageRecalled':
             patchState(store, {
@@ -177,6 +183,7 @@ export const ChatStore = signalStore(
                 return msg;
               }),
             });
+            store.enableAutoScroll();
             break;
           case 'messageUndoRecalled':
             patchState(store, {
@@ -197,8 +204,10 @@ export const ChatStore = signalStore(
                 return msg;
               }),
             });
+            store.enableAutoScroll();
           break;
           case 'privateMessageRead':
+            store.disableAutoScroll();
             patchState(store, {
               privateMessages: store.privateMessages().map(msg => {
                 if (msg.room === message.data.room) {
@@ -210,8 +219,10 @@ export const ChatStore = signalStore(
                 return msg;
               }),
             });
+            store.enableAutoScroll();
             break;
           case 'messagesReadByUpdated':
+            store.disableAutoScroll();
             patchState(store, {
               generalMessages: store.generalMessages().map(msg => {
                 const findUpdated = message.data.find((data:{id:string}) => data.id === msg.id);
@@ -224,6 +235,7 @@ export const ChatStore = signalStore(
                 return msg;
               }),
             });
+            store.enableAutoScroll();
             break;
           default:
             break
@@ -305,6 +317,7 @@ export const ChatStore = signalStore(
               "id": id
           }
       }));
+      store.disableAutoScroll();
     };
 
     const undoRecallMessage = (room: string, id: any) =>{
@@ -316,6 +329,7 @@ export const ChatStore = signalStore(
               "id": id
           }
       }));
+      store.disableAutoScroll();
     };
 
     return {
