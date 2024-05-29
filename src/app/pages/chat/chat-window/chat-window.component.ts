@@ -81,16 +81,16 @@ import { Dialog } from '@angular/cdk/dialog';
         <!-- 自己傳的訊息 -->
         @if(message.isRecalled){
           <!-- 收回 -->
-          <div class=" flex justify-end mb-4">
-            <div class="bg-gray-100 p-2 rounded-lg mb-2">
+          <div class=" flex justify-end mb-5">
+            <div class="bg-gray-100 p-2 rounded-lg">
               <p class="text-sm text-gray-500 italic">Message recalled</p>
               <button class="text-xs text-blue-500 hover:underline" (click)="store.undoRecallMessage(message.room, message.id)">Undo Recall</button>
             </div>
           </div>
         }@else {
           <!-- 顯示 -->
-          <div class=" flex justify-end mb-4">
-            <div class="group flex ml-10 relative">
+          <div class=" flex justify-end pb-5 group">
+            <div class="flex ml-10 relative">
               <div class="flex flex-col justify-end text-right text-xs text-gray-500 mt-1">
                 @if(store.currentChatPartner()?.username !== 'general' && message.isRead){
                   <span class="text-[10px] fon-size text-green-500">Read</span>
@@ -114,9 +114,9 @@ import { Dialog } from '@angular/cdk/dialog';
               }@else {
                 <div class="ml-1 bg-blue-500 text-white p-2 rounded-lg whitespace-pre-wrap" [innerHTML]="message.message"></div>
               }
-              <div class="hidden group-hover:flex absolute bottom-[4px] right-[4px]">
-                <button class="bg-red-400 rounded-md text-white px-2 py-1" (click)="store.recallMessage(message.room, message.id)">Recall</button>
-              </div>
+                <div class="hidden group-hover:flex absolute bottom-[-25px] right-[4px] z-10">
+                  <button class="text-xs bg-red-400 rounded-md text-white px-2 py-1" (click)="store.recallMessage(message.room, message.id)">Recall</button>
+                </div>
             </div>
           </div>
         }
@@ -137,7 +137,7 @@ import { Dialog } from '@angular/cdk/dialog';
           </div>
         }@else{
           <!-- 顯示 -->
-          <div class="mb-4">
+          <div class="mb-5">
             <div class="flex items-center mb-2">
               <img class="w-6 h-6 rounded-full mr-2" src="https://api.dicebear.com/8.x/pixel-art/svg?seed={{message.sender}}" alt="Profile Image">
               <div class="text-sm font-semibold">{{ message.sender }}</div>
