@@ -165,38 +165,43 @@ import { Dialog } from '@angular/cdk/dialog';
   <!-- 輸入框 -->
   <div class="p-4 border-t flex-shrink-0">
     <div class="flex items-center">
+
       <textarea 
         #textArea
         [disabled]="!store.currentChatPartner()?.username"
         [(ngModel)]="message"
         placeholder="Type Your Message Here" 
-        class="w-full p-2 rounded-lg bg-gray-100 shadow-inner focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none disabled:opacity-50 disabled:cursor-not-allowed" 
+        class="flex-grow px-4 py-2 bg-white border border-gray-300 rounded-2 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none disabled:opacity-50 disabled:cursor-not-allowed"
         rows="2" 
         style="line-height: 1.5;"
         (focus)="saveSelection()" 
         (blur)="saveSelection();viewService.resetScroll()"
         (keydown.enter)="sendMessage($event)"
       ></textarea>
+
       <button
         [disabled]="!store.currentChatPartner()?.username"
-        class="ml-2 bg-blue-500 text-white rounded-full w-11 h-10 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed" 
-        (click)="sendMessage()"
-      >
-        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M2 21l21-9-21-9v7l15 2-15 2v7z"></path>
+        (click)="sendMessage()" 
+        class="flex items-center justify-center w-10 h-10 ml-2 text-white bg-blue-500 rounded-full hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed">
+        <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
         </svg>
       </button>
-      <button
-        [disabled]="!store.currentChatPartner()?.username" 
-        class="hidden sm:block p-2 text-4xl cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed" 
+
+      <button 
         (click)="isShowEmojiMart.set(!isShowEmojiMart())"
-      >
-        😀
+        [disabled]="!store.currentChatPartner()?.username" 
+        class="hidden sm:flex items-center justify-center w-10 h-10 ml-2 text-gray-700 bg-white border border-gray-300 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-500 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
+        <svg class="w-8 h-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.182 15.182a4.5 4.5 0 0 1-6.364 0M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0ZM9.75 9.75c0 .414-.168.75-.375.75S9 10.164 9 9.75 9.168 9 9.375 9s.375.336.375.75Zm-.375 0h.008v.015h-.008V9.75Zm5.625 0c0 .414-.168.75-.375.75s-.375-.336-.375-.75.168-.75.375-.75.375.336.375.75Zm-.375 0h.008v.015h-.008V9.75Z" />
+        </svg>
       </button>
-      
+
       <app-image-upload />
+
     </div>
   </div>
+
   @if(isShowEmojiMart()){
     <div class="hidden sm:block  absolute bottom-[85px] right-[10px] z-40">
       <emoji-mart (emojiClick)="addEmoji($event)"></emoji-mart>
