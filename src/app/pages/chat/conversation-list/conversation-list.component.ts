@@ -121,7 +121,7 @@ import { UserService } from './../../../services/user.service';
 													class="absolute top-6 right-2 mt-1 mr-1 bg-red-500 text-white text-xs font-semibold w-5 h-5 flex items-center justify-center rounded-full"
 													[ngClass]="{ 
 														'w-7': user?.unreadCount ?? 0 > 99,
-          											}" 
+          								}" 
 												>{{ user?.unreadCount }}</span>
 											}
 									</div>

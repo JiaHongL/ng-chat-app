@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, ElementRef, viewChild, ChangeDetectorRef, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, viewChild, ChangeDetectorRef, inject, input, output } from '@angular/core';
 import { ChatStore } from '../../../store/chat.store';
 
 @Component({
@@ -58,6 +58,7 @@ export class ImageUploadComponent {
   uploadInput = viewChild<ElementRef<HTMLInputElement>>('uploadInput');
   cdr = inject(ChangeDetectorRef);
   store = inject(ChatStore);
+  upload = output<string>();
 
   onFileSelected(event: Event): void {
     const fileInput = event.target as HTMLInputElement;
@@ -99,12 +100,7 @@ export class ImageUploadComponent {
   }
 
   send(){
-    const room = this.store.currentRoom();
-    if (room === 'general') {
-      this.store.sendGeneralMessage(this.base64String as string);
-    } else {
-      this.store.sendPrivateMessage(this.base64String as string);
-    }
+    this.upload.emit(this.base64String as string);
     this.clearSelectedFile();
   }
 

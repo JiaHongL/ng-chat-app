@@ -7,6 +7,8 @@ export interface GeneralMessage {
     date: string;
     isRecalled:boolean;
     readBy: string[];
+    replyToMessageId:string;
+    replyToMessage:GeneralMessage | null;
 }
 
 export interface PrivateMessage {
@@ -18,6 +20,8 @@ export interface PrivateMessage {
     date: string;
     isRead: boolean;
     isRecalled:boolean;
+    replyToMessageId:string;
+    replyToMessage:PrivateMessage | null;
 }
 
 export type RoomMessage = GeneralMessage & PrivateMessage;

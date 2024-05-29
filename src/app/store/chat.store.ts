@@ -1,7 +1,7 @@
 // chat.store.ts
 import { inject, computed } from '@angular/core';
 import { signalStore, withState, withMethods, patchState, withComputed, getState } from '@ngrx/signals';
-import { User, ChatState, initialState, UserInfo, PrivateMessage, RoomMessage } from './models';
+import { User, ChatState, initialState, UserInfo, PrivateMessage, RoomMessage, GeneralMessage } from './models';
 
 import { environment } from '../../environments/environment';
 
@@ -88,9 +88,30 @@ export const ChatStore = signalStore(
       const currentRoom = store.currentRoom();
       if (currentRoom === 'general') {
         let generalMessages = store.generalMessages() || [];
+        generalMessages = generalMessages.map(msg => {
+          if (msg.replyToMessageId) {
+            const replyToMessage = generalMessages.find(m => m.id === msg.replyToMessageId) as GeneralMessage;
+            return {
+              ...msg,
+              replyToMessage,
+            };
+          }
+          return msg;
+        });
+
         return generalMessages as RoomMessage[];
       } else {
         let privateMessage = [...store.privateMessages().filter(msg => ( msg.room === currentRoom))] || [];
+        privateMessage = privateMessage.map(msg => {
+          if (msg.replyToMessageId) {
+            const replyToMessage = privateMessage.find(m => m.id === msg.replyToMessageId) as PrivateMessage;
+            return {
+              ...msg,
+              replyToMessage,
+            };
+          }
+          return msg;
+        });
         return privateMessage as RoomMessage[];
       }
     })
@@ -260,7 +281,7 @@ export const ChatStore = signalStore(
       }
     };
 
-    const sendGeneralMessage = (message: string) => {
+    const sendGeneralMessage = (message: string, replyToMessageId?:string) => {
       if (!socket) {return}
         socket.send(JSON.stringify({
           "event": "message",
@@ -268,11 +289,12 @@ export const ChatStore = signalStore(
               "room": "general",
               "message": message,
               "sender": store.userInfo()?.username,
+              "replyToMessageId": replyToMessageId
           }
       }));
     }
 
-    const sendPrivateMessage = (message: string) => {
+    const sendPrivateMessage = (message: string, replyToMessageId?:string) => {
       if (!socket) {return}
         socket.send(JSON.stringify({
           "event": "privateMessage",
@@ -280,6 +302,7 @@ export const ChatStore = signalStore(
               "to": store.currentChatPartner()?.username,
               "message": message,
               "sender": store.userInfo()?.username,
+              "replyToMessageId": replyToMessageId
           }
       }));
     }

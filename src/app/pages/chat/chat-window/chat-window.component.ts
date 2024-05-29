@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, ElementRef, HostBinding, computed, effect, inject, input, signal, viewChild, untracked} from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, HostBinding, computed, effect, inject, input, signal, viewChild, untracked, HostListener, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -8,6 +8,9 @@ import { ChatStore } from '../../../store/chat.store';
 import { PickerComponent } from '@ctrl/ngx-emoji-mart';
 import { ImageUploadComponent } from '../../../shared/components/image-upload/image-upload.component';
 import { ImagePreviewComponent } from './image-preview/image-preview.component';
+import { MoreOptionsButtonComponent } from './more-options-button/more-options-button.component';
+import { TruncatePipe } from '../../../shared/pipes/truncate.pipe';
+
 import { Dialog } from '@angular/cdk/dialog';
 
 @Component({
@@ -19,13 +22,15 @@ import { Dialog } from '@angular/cdk/dialog';
     FormsModule,
     PickerComponent,
     ImageUploadComponent,
-    ImagePreviewComponent
+    ImagePreviewComponent,
+    MoreOptionsButtonComponent,
+    TruncatePipe
   ],
   template: `
   <!-- 頂部 -->
   <div 
     class="flex flex-shrink-0 items-center p-4 border-b overflow-hidden" 
-    (click)="isShowEmojiMart.set(false)"
+    (click)="isShowEmojiMart.set(false);"
   >
     <div class="flex items-center p-2 bg-white" (click)="viewService.goBack();isShowEmojiMart.set(false)">
         <button class="block sm:hidden text-blue-500 flex items-center">
@@ -75,23 +80,39 @@ import { Dialog } from '@angular/cdk/dialog';
     (click)="isShowEmojiMart.set(false)"
   >
     <!-- Repeat similar message blocks for chat messages -->
-    @for (message of store.currentChatMessages(); track message.room) {
+    @for (message of store.currentChatMessages();let index = $index; track message.room) {
       
-      @if(message.sender === store.userInfo()?.username){ 
+      @if(message.sender === store.userInfo()?.username){
         <!-- 自己傳的訊息 -->
-        @if(message.isRecalled){
+        <div [id]="'message-' + message.id">
           <!-- 收回 -->
-          <div class=" flex justify-end mb-5">
-            <div class="bg-gray-100 p-2 rounded-lg">
-              <p class="text-sm text-gray-500 italic">Message recalled</p>
-              <button class="text-xs text-blue-500 hover:underline" (click)="store.undoRecallMessage(message.room, message.id)">Undo Recall</button>
+          @if(message.isRecalled){
+            <div class=" flex justify-end mb-5">
+              <div class="bg-gray-100 p-2 rounded-lg">
+                <p class="text-sm text-gray-500 italic">Message recalled</p>
+                <button class="text-xs text-blue-500 hover:underline" (click)="store.undoRecallMessage(message.room, message.id)">Undo Recall</button>
+              </div>
             </div>
-          </div>
-        }@else {
+          }@else {
           <!-- 顯示 -->
-          <div class=" flex justify-end pb-5 group">
-            <div class="flex ml-10 relative">
-              <div class="flex flex-col justify-end text-right text-xs text-gray-500 mt-1">
+          <div 
+            class="flex justify-end group pb-5 ml-8"
+          >
+            <!-- 選單 -->
+            <app-more-options-button 
+              [index]="index"
+              [message]="message" 
+              [openDropdownIndex]="openDropdownIndex()" 
+              (moreOptionClick)="openDropdownIndex.set($event)"
+              (recallMessage)="resetOpenDropdownIndex();store.recallMessage($event.room, $event.id);"
+              (replyMessage)="resetOpenDropdownIndex();selectedMessageId.set($event)"
+            ></app-more-options-button>
+
+            <div class="flex relative">
+              <!-- 已讀 + 時間 -->
+              <div 
+                class="flex flex-col justify-end text-right text-xs text-gray-500 mt-1"
+              >
                 @if(store.currentChatPartner()?.username !== 'general' && message.isRead){
                   <span class="text-[10px] fon-size text-green-500">Read</span>
                 }
@@ -102,68 +123,215 @@ import { Dialog } from '@angular/cdk/dialog';
                   {{ message.date | date: 'HH:mm' }}
                 </div>
               </div>
+
+              <!-- 自己傳的圖片 -->
               @if(message?.message?.includes('data:image')){
-                <div class="ml-1 bg-blue-500 p-2 rounded-lg">
-                  <img
-                    (click)="openImagePreview(message.message)"
-                    class="cursor-pointer max-w-[200px] max-w-[200px] ml-auto rounded-lg ml-1" 
-                    [src]="message.message" 
-                    alt="Image"
-                  >
+                <div>
+                  @if(message.replyToMessage){
+                      <div 
+                        (click)="scrollToMessage(message?.replyToMessage?.id)" 
+                        class="cursor-pointer ml-1 pb-1  flex bg-blue-500 rounded-t-lg text-white whitespace-pre-wrap border-y border-b-slate-300"
+                      >
+                        <div class="flex shrink-0 items-center">
+                          <img class="w-6 h-6 rounded-full mx-2 bg-white" src="https://api.dicebear.com/8.x/pixel-art/svg?seed={{message?.replyToMessage?.sender}}" alt="Profile Image">
+                        </div>
+                        @if (message?.replyToMessage?.isRecalled){
+                          <div class="flex flex-col">
+                            <div class="text-white  mr-2">{{ message.replyToMessage.sender }}</div>
+                            <div class="text-sm text-gray-200 italic">Message recalled</div>
+                          </div>
+                        }@else if(message?.replyToMessage?.message?.includes('data:image')){
+                          <div class="flex justify-center items-center">
+                            <div class="text-white mr-2">{{ message.replyToMessage.sender }}</div>
+                            <img class="max-w-[60px] max-h-[60px] m-1 rounded-lg" [src]="message?.replyToMessage?.message" alt="Image">
+                          </div>
+                        }@else {
+                          <div class="flex flex-col">
+                            <div class="text-white">{{ message.replyToMessage.sender }}</div>
+                            <div class="text-sm text-gray-200">{{message.replyToMessage.message | truncate:45}}
+                            </div>
+                          </div>
+                        }
+                      </div>
+                      }
+                      <div 
+                        class="ml-1 bg-blue-500 p-2 rounded-b-lg"
+                        [ngClass]="{'rounded-t-lg': !message?.replyToMessage}" 
+                      >
+                        <img
+                          (click)="openImagePreview(message.message)"
+                          class="cursor-pointer max-w-[200px] max-h-[200px] ml-auto rounded-lg ml-1" 
+                          [src]="message.message" 
+                          alt="Image"
+                        >
+                    </div>
                 </div>
               }@else {
-                <div class="ml-1 bg-blue-500 text-white p-2 rounded-lg whitespace-pre-wrap" [innerHTML]="message.message"></div>
-              }
-                <div class="hidden group-hover:flex absolute bottom-[-25px] right-[4px] z-10">
-                  <button class="text-xs bg-red-400 rounded-md text-white px-2 py-1" (click)="store.recallMessage(message.room, message.id)">Recall</button>
+                <!-- 自己傳的文字 -->
+                <div>
+                  @if(message?.replyToMessage){
+                    <div 
+                      (click)="scrollToMessage(message.replyToMessage?.id)" 
+                      class="cursor-pointer ml-1 pb-1  flex bg-blue-500 rounded-t-lg text-white whitespace-pre-wrap border-y border-b-slate-300"
+                    >
+                      <div class="flex shrink-0 items-center">
+                        <img class="w-6 h-6 rounded-full mx-2 bg-white" src="https://api.dicebear.com/8.x/pixel-art/svg?seed={{message.replyToMessage?.sender}}" alt="Profile Image">
+                      </div>
+                      @if (message?.replyToMessage?.isRecalled){
+                          <div class="flex flex-col">
+                            <div class="text-white  mr-2">{{ message.replyToMessage?.sender }}</div>
+                            <div class="text-sm text-gray-200 pr-2 italic">Message recalled</div>
+                          </div> 
+                      }@else if(message?.replyToMessage?.message?.includes('data:image')){
+                        <div class="flex justify-center items-center">
+                          <div class="text-white mr-2">{{ message.replyToMessage?.sender }}</div>
+                          <img class="max-w-[60px] max-h-[60px] m-1 rounded-lg" [src]="message.replyToMessage?.message" alt="Image">
+                        </div>
+                      }@else {
+                        <div class="flex flex-col">
+                          <div class="text-white">{{ message?.replyToMessage?.sender }}</div>
+                          <div class="text-sm text-gray-200">{{message.replyToMessage?.message ?? '' | truncate:45}}
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  }
+                  <div 
+                    class="ml-1 bg-blue-500 text-white rounded-b-lg p-2 whitespace-pre-wrap"
+                    [ngClass]="{'rounded-t-lg': !message.replyToMessage}" 
+                    [innerHTML]="message.message"
+                  ></div>
                 </div>
+              }
+
             </div>
           </div>
         }
+        </div> 
       }@else{
-        <!-- 別人傳的訊息 -->
-        @if(message.isRecalled){
-          <!-- 收回 -->
-          @if(store.currentChatPartner()?.username === 'general'){
-            <div class="flex items-center mb-2">
-              <img class="w-6 h-6 rounded-full mr-2" src="https://api.dicebear.com/8.x/pixel-art/svg?seed={{message.sender}}" alt="Profile Image">
-              <div class="text-sm font-semibold">{{ message.sender }}</div>
+        <!-- 對方傳的訊息 -->
+        <div [id]="'message-' + message.id">
+          @if(message.isRecalled){
+            <!-- 收回 -->
+            @if(store.currentChatPartner()?.username === 'general'){
+              <div class="flex items-center mb-2">
+                <img class="w-6 h-6 rounded-full mr-2" src="https://api.dicebear.com/8.x/pixel-art/svg?seed={{message.sender}}" alt="Profile Image">
+                <div class="text-sm font-semibold">{{ message.sender }}</div>
+              </div>
+            }
+            <div class=" flex justify-start mb-4">
+              <div class="bg-gray-100 p-2 rounded-lg mb-2">
+                <p class="text-sm text-gray-500 italic" id="recalledMessageText"> Message recalled</p>
+              </div>
+            </div>
+          }@else{
+            <!-- 顯示 -->
+            <div class="group pb-5 mr-8 flex">
+              <div>
+                <!-- 對方的頭像加文字 -->
+                <div class="flex items-center mb-2">
+                  <img class="w-6 h-6 rounded-full mr-2" src="https://api.dicebear.com/8.x/pixel-art/svg?seed={{message.sender}}" alt="Profile Image">
+                  <div class="text-sm font-semibold">{{ message.sender }}</div>
+                </div>
+                <div class="flex">
+                  <!-- 對方傳的照片 -->
+                  @if(message?.message?.includes('data:image')){
+                    <div>
+                      @if(message.replyToMessage){
+                        <div
+                          (click)="scrollToMessage(message?.replyToMessage?.id)" 
+                          class="cursor-pointer mr-1 pb-1  flex bg-gray-200 rounded-t-lg whitespace-pre-wrap border-y border-b-slate-300"
+                        >
+                          <div class="flex shrink-0 items-center">
+                            <img class="w-6 h-6 rounded-full mx-2 bg-white" src="https://api.dicebear.com/8.x/pixel-art/svg?seed={{message?.replyToMessage?.sender}}" alt="Profile Image">
+                          </div>
+                          @if (message?.replyToMessage?.isRecalled){
+                            <div class="flex flex-col">
+                              <div class="mr-2 text-black">{{ message.replyToMessage.sender }}</div>
+                              <div class="text-sm text-gray-400 italic">Message recalled</div>
+                            </div>
+                          }@else if(message?.replyToMessage?.message?.includes('data:image')){
+                            <div class="flex justify-center items-center">
+                              <div class="mr-2 text-black">{{ message.replyToMessage.sender }}</div>
+                              <img class="max-w-[60px] max-h-[60px] m-1 rounded-lg" [src]="message?.replyToMessage?.message" alt="Image">
+                            </div>
+                          }@else {
+                            <div class="flex flex-col">
+                              <div class="text-black">{{ message.replyToMessage.sender }}</div>
+                              <div class="text-sm text-gray-400">{{message.replyToMessage.message | truncate:45}}
+                              </div>
+                            </div>
+                          }
+                        </div>
+                      }
+                      <div 
+                        class="mr-1 bg-gray-200 p-2 rounded-b-lg"
+                        [ngClass]="{'rounded-t-lg': !message?.replyToMessage}" 
+                      >
+                        <img
+                          (click)="openImagePreview(message.message)" 
+                          class="cursor-pointer max-w-[200px] max-h-[200px] rounded-lg" 
+                          [src]="message.message" 
+                          alt="Image"
+                        >
+                      </div>
+                    </div>
+                  }@else {
+                    <!-- 對方傳的文字 -->
+                    <div class="flex flex-col">
+                      @if(message?.replyToMessage){
+                        <div
+                          (click)="scrollToMessage(message.replyToMessage?.id)"
+                          class="cursor-pointer pb-1  flex bg-gray-200 rounded-t-lg  whitespace-pre-wrap border-y border-b-slate-300"
+                        >
+                          <div class="flex shrink-0 items-center">
+                            <img class="w-6 h-6 rounded-full mx-2 bg-white" src="https://api.dicebear.com/8.x/pixel-art/svg?seed={{message.replyToMessage?.sender}}" alt="Profile Image">
+                          </div>
+                          @if (message?.replyToMessage?.isRecalled){
+                              <div class="flex flex-col">
+                                <div class="mr-2 text-black">{{ message.replyToMessage?.sender }}</div>
+                                <div class="text-sm pr-2 text-gray-400 italic">Message recalled</div>
+                              </div> 
+                          }@else if(message?.replyToMessage?.message?.includes('data:image')){
+                            <div class="flex justify-center items-center">
+                              <div class="mr-2 text-black">{{ message.replyToMessage?.sender }}</div>
+                              <img class="max-w-[60px] max-h-[60px] m-1 rounded-lg" [src]="message.replyToMessage?.message" alt="Image">
+                            </div>
+                          }@else {
+                            <div class="flex flex-col">
+                              <div class="text-black">{{ message?.replyToMessage?.sender }}</div>
+                              <div class="text-sm text-gray-400">{{message.replyToMessage?.message ?? '' | truncate:45}}
+                              </div>
+                            </div>
+                          }
+                        </div>
+                      }
+                      <div 
+                        class="w-full bg-gray-200 p-2 rounded-b-lg whitespace-pre-wrap"
+                        [ngClass]="{'rounded-t-lg': !message.replyToMessage}"  
+                        [innerHTML]="message.message"
+                      ></div>
+                    </div>
+                  }
+                  <div class="self-end text-left text-xs text-gray-500 mt-1">{{ message.date | date: 'HH:mm' }}</div>
+                </div>
+              </div>
+              <app-more-options-button 
+                [index]="index"
+                [message]="message"
+                [messageType]="'other'"
+                [openDropdownIndex]="openDropdownIndex()" 
+                (moreOptionClick)="openDropdownIndex.set($event)"
+                (replyMessage)="resetOpenDropdownIndex();selectedMessageId.set($event)"
+              ></app-more-options-button>
             </div>
           }
-          <div class=" flex justify-start mb-4">
-            <div class="bg-gray-100 p-2 rounded-lg mb-2">
-              <p class="text-sm text-gray-500 italic" id="recalledMessageText"> Message recalled</p>
-            </div>
-          </div>
-        }@else{
-          <!-- 顯示 -->
-          <div class="mb-5">
-            <div class="flex items-center mb-2">
-              <img class="w-6 h-6 rounded-full mr-2" src="https://api.dicebear.com/8.x/pixel-art/svg?seed={{message.sender}}" alt="Profile Image">
-              <div class="text-sm font-semibold">{{ message.sender }}</div>
-            </div>
-            <div class="mr-8 flex">
-              @if(message?.message?.includes('data:image')){
-                <div class="mr-1 bg-blue-500 p-2 rounded-lg">
-                  <img
-                    (click)="openImagePreview(message.message)" 
-                    class="cursor-pointer max-w-[200px] max-w-[200px] ml-auto rounded-lg ml-1" 
-                    [src]="message.message" 
-                    alt="Image"
-                  >
-                </div>
-              }@else {
-                <div class="mr-1 w-fit bg-gray-200 p-2 rounded-lg whitespace-pre-wrap" [innerHTML]="message.message"></div>
-              }
-              <div class="self-end text-left text-xs text-gray-500 mt-1">{{ message.date | date: 'HH:mm' }}</div>
-            </div>
-          </div>
-        }
+        </div>
       }
     }
   </div>
   <!-- 輸入框 -->
-  <div class="p-4 border-t flex-shrink-0">
+  <div class="relative p-4 border-t flex-shrink-0">
     <div class="flex items-center">
 
       <textarea 
@@ -197,9 +365,51 @@ import { Dialog } from '@angular/cdk/dialog';
         </svg>
       </button>
 
-      <app-image-upload />
+      <app-image-upload 
+        (upload)="sendBase64Message($event)"
+      />
 
     </div>
+    <!-- reply message -->
+    @if(selectedMessage()){
+      <div class="absolute h-[60px] top-[-60px] left-0 flex bg-slate-200 w-full p-2">
+        <div class="flex shrink-0 items-center">
+          <img class="w-10 h-10 rounded-full mr-2 bg-white" src="https://api.dicebear.com/8.x/pixel-art/svg?seed={{selectedMessage()?.sender}}" alt="Profile Image">
+        </div>
+        <div class="flex flex-col justify-center overflow-hidden">
+          @if(!selectedMessage()?.message?.includes('data:image')){
+            <!-- 文字 -->
+            <div>
+              <div class="text-base font-semibold">{{ selectedMessage()?.sender }}</div>
+              <div class="pr-2 text-gray-500 text-base whitespace-nowrap overflow-hidden overflow-ellipsis">
+                {{ selectedMessage()?.message }}
+              </div>
+            </div>
+          }
+          @if(selectedMessage()?.message?.includes('data:image')){
+            <div class="flex">
+              <div class="leading-[60px] mr-2 text-base font-semibold">{{ selectedMessage()?.sender }}</div>
+              <!-- 圖片 -->
+              <div class="rounded-lg">
+                <img
+                  class="max-w-[60px] max-h-[60px] ml-auto rounded-lg ml-1" 
+                  [src]="selectedMessage()?.message" 
+                  alt="Image"
+                >
+              </div>
+            </div>
+          }
+        </div>
+        <div
+          (click)="selectedMessageId.set('')"
+          class="absolute top-[5px] right-[5px] cursor-pointer"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+          </svg>
+        </div>
+      </div>
+    }
   </div>
 
   @if(isShowEmojiMart()){
@@ -211,15 +421,28 @@ import { Dialog } from '@angular/cdk/dialog';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ChatWindowComponent {
-  @HostBinding('class') class = 'relative pl-0 sm:pl-3 flex-1 flex flex-col min-w-[250px] sm:h-auto';
+  @HostListener('window:click', ['$event'])
+  onWindowClick(event: Event) {
+    this.openDropdownIndex.set(-1);
+  }
 
-  usageContext = input.required<'desktop'|'mobile'>();
+  @HostBinding('class') class = 'relative pl-0 sm:pl-3 flex-1 flex flex-col min-w-[250px] sm:h-auto';
+  cdf = inject(ChangeDetectorRef);
+
+  usageContext = input.required<'desktop' | 'mobile'>();
 
   store = inject(ChatStore);
   viewService = inject(ViewService);
 
   chatBox = viewChild<ElementRef<HTMLDivElement>>('chatBox');
   message = signal<string>('');
+
+  openDropdownIndex = signal<number>(-1);
+  selectedMessageId = signal<string>('');
+  selectedMessage = computed(() => {
+    const messages = this.store.currentChatMessages();
+    return messages.find(message => message.id === this.selectedMessageId());
+  });
 
   dynamicHeight = signal({
     height: 'calc(100vh - 180px)'
@@ -268,13 +491,20 @@ export class ChatWindowComponent {
 
   currentChatMessagesChangeEffect = effect(() => {
     const currentChatMessages = this.store.currentChatMessages();
-    const isAutoScrollEnabled = untracked(()=> this.store.isAutoScrollEnabled());
+    const isAutoScrollEnabled = untracked(() => this.store.isAutoScrollEnabled());
     if (
       isAutoScrollEnabled &&
-      currentChatMessages 
+      currentChatMessages
     ) {
       this.chatBoxScrollToBottom();
     }
+  });
+
+  currentChatPartnerUsernameChangeEffect = effect(() => {
+    const currentChatPartnerUsername = this.store.currentChatPartner()?.username;
+    this.message.set('');
+  },{
+    allowSignalWrites: true
   });
 
   unreadCountsChangeEffect = effect(() => {
@@ -285,7 +515,7 @@ export class ChatWindowComponent {
     const usageContext = this.usageContext();
     const currentChatPartnerUsername = this.store.currentChatPartner()?.username as string;
 
-    if(!currentChatPartnerUsername){
+    if (!currentChatPartnerUsername) {
       return;
     }
 
@@ -312,12 +542,12 @@ export class ChatWindowComponent {
     // 如果是在私人房間，且有未讀訊息，就標記已讀
     if (
       (
-        isMobile &&  usageContext =='mobile' &&
+        isMobile && usageContext == 'mobile' &&
         room !== 'general' &&
         unreadCounts[receiveRoom] > 0
-      )||
+      ) ||
       (
-        !isMobile && usageContext =='desktop' &&
+        !isMobile && usageContext == 'desktop' &&
         room !== 'general' &&
         unreadCounts[receiveRoom] > 0
       )
@@ -327,21 +557,39 @@ export class ChatWindowComponent {
 
   });
 
+  sendBase64Message(base64String: string) {
+    const room = this.store.currentRoom();
+    const selectedMessageId = this.selectedMessageId() || '';
+    if (room === 'general') {
+      this.store.sendGeneralMessage(base64String, selectedMessageId);
+    } else {
+      this.store.sendPrivateMessage(base64String, selectedMessageId);
+    }
+
+    this.clearState();
+  }
+
   sendMessage(event?: Event) {
     const message = this.message();
     if (event) { event.preventDefault(); }
     if ((event as KeyboardEvent)?.isComposing || message.trim() === '') { return; }
 
     const room = this.store.currentRoom();
+    const selectedMessageId = this.selectedMessageId() || '';
     if (room === 'general') {
-      this.store.sendGeneralMessage(message);
+      this.store.sendGeneralMessage(message, selectedMessageId);
     } else {
-      this.store.sendPrivateMessage(message);
+      this.store.sendPrivateMessage(message, selectedMessageId);
     }
 
+    this.clearState();
+  }
+
+  clearState() {
     this.message.set('');
+    this.selectedMessageId.set('');
     this.isShowEmojiMart.set(false);
-    this.viewService.resetScroll();
+    this.openDropdownIndex.set(-1);
   }
 
   addEmoji(event: any) {
@@ -391,6 +639,20 @@ export class ChatWindowComponent {
         base64String: imageUrl
       }
     });
+  }
+
+  scrollToMessage(replyToId:any): void {
+    if (replyToId) {
+      const element = document.getElementById(`message-${replyToId}`);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+  }
+
+  resetOpenDropdownIndex() {
+    this.openDropdownIndex.set(-1);
+    this.cdf.detectChanges();
   }
 
 }
