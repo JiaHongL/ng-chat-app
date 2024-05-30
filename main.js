@@ -72054,7 +72054,7 @@ var _ChatWindowComponent = class _ChatWindowComponent {
       if (partner?.username === "general") {
         return "https://api.dicebear.com/8.x/initials/svg?seed=General";
       } else {
-        return `{{environment.profileImageApi}}${this.store.currentChatPartner()?.username}`;
+        return `${environment.profileImageApi}${this.store.currentChatPartner()?.username}`;
       }
     });
     this.chatPartnerChangeEffect = effect(() => {
