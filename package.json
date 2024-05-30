@@ -2,7 +2,7 @@
   "name": "ng-chat-app",
   "version": "0.0.0",
   "scripts": {
-    "deploy": "ng deploy --base-href=/ng-chat-app/",
+    "deploy": "ng deploy --base-href=/ng-chat-app/ --build-target=ng-chat-app:build:gh-pages",
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
