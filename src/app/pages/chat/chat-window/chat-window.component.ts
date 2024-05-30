@@ -147,7 +147,7 @@ import { Dialog } from '@angular/cdk/dialog';
                         }@else if(message?.replyToMessage?.message?.includes('data:image')){
                           <div class="flex justify-center items-center">
                             <div class="text-white mr-2">{{ message.replyToMessage.sender }}</div>
-                            <img class="max-w-[60px] max-h-[60px] mt-1 rounded-lg" [src]="message?.replyToMessage?.message" alt="Image">
+                            <img class="max-w-[80px] max-h-[80px] mt-1 mr-1 rounded-lg" [src]="message?.replyToMessage?.message" alt="Image">
                           </div>
                         }@else {
                           <div class="flex flex-col">
@@ -189,7 +189,7 @@ import { Dialog } from '@angular/cdk/dialog';
                       }@else if(message?.replyToMessage?.message?.includes('data:image')){
                         <div class="flex justify-center items-center">
                           <div class="text-white mr-2">{{ message.replyToMessage?.sender }}</div>
-                          <img class="max-w-[60px] max-h-[60px] mt-1 rounded-lg" [src]="message.replyToMessage?.message" alt="Image">
+                          <img class="max-w-[80px] max-h-[80px] m-1 rounded-lg" [src]="message.replyToMessage?.message" alt="Image">
                         </div>
                       }@else {
                         <div class="flex flex-col">
@@ -257,7 +257,7 @@ import { Dialog } from '@angular/cdk/dialog';
                           }@else if(message?.replyToMessage?.message?.includes('data:image')){
                             <div class="flex justify-center items-center">
                               <div class=" text-black">{{ message.replyToMessage.sender }}</div>
-                              <img class="max-w-[60px] max-h-[60px] mt-1 rounded-lg" [src]="message?.replyToMessage?.message" alt="Image">
+                              <img class="max-w-[80px] max-h-[80px] mt-1 ml-1 mr-1 rounded-lg" [src]="message?.replyToMessage?.message" alt="Image">
                             </div>
                           }@else {
                             <div class="flex flex-col">
@@ -299,7 +299,7 @@ import { Dialog } from '@angular/cdk/dialog';
                           }@else if(message?.replyToMessage?.message?.includes('data:image')){
                             <div class="flex justify-center items-center">
                               <div class="mr-2 text-black">{{ message.replyToMessage?.sender }}</div>
-                              <img class="max-w-[60px] max-h-[60px] mt-1 rounded-lg" [src]="message.replyToMessage?.message" alt="Image">
+                              <img class="max-w-[80px] max-h-[80px] mt-1 mr-1 rounded-lg" [src]="message.replyToMessage?.message" alt="Image">
                             </div>
                           }@else {
                             <div class="flex flex-col">
