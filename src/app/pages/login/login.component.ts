@@ -62,7 +62,7 @@ export class LoginComponent {
   viewService = inject(ViewService);
   dialog = inject(Dialog);
 
-  username = signal<string>('joe');
+  username = signal<string>('Joe');
   password = signal<string>('abc');
 
   openRegisterDialog() {
