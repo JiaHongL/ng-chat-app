@@ -12,6 +12,7 @@ import { ImageUploadComponent } from '../../../shared/components/image-upload/im
 import { ImagePreviewComponent } from './image-preview/image-preview.component';
 import { MoreOptionsButtonComponent } from './more-options-button/more-options-button.component';
 import { TruncatePipe } from '../../../shared/pipes/truncate.pipe';
+import { PasteImageDirective } from '../../../shared/directive/paste-image.directive';
 
 import { Dialog } from '@angular/cdk/dialog';
 
@@ -26,7 +27,8 @@ import { Dialog } from '@angular/cdk/dialog';
     ImageUploadComponent,
     ImagePreviewComponent,
     MoreOptionsButtonComponent,
-    TruncatePipe
+    TruncatePipe,
+    PasteImageDirective
   ],
   template: `
   <!-- 頂部 -->
@@ -340,7 +342,9 @@ import { Dialog } from '@angular/cdk/dialog';
 
       <textarea 
         #textArea
+        appPasteImage
         [disabled]="!store.currentChatPartner()?.username"
+        (imagePasted)="imagePasted($event)"
         [(ngModel)]="message"
         placeholder="Type Your Message Here" 
         class="flex-grow px-4 py-2 bg-white border border-gray-300 rounded-2 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none disabled:opacity-50 disabled:cursor-not-allowed"
@@ -635,6 +639,19 @@ export class ChatWindowComponent {
   chatBoxScrollToBottom() {
     setTimeout(() => {
       this.chatBox()?.nativeElement.scrollTo(0, this.chatBox()?.nativeElement.scrollHeight as number);
+    });
+  }
+
+  imagePasted(base64String: string) {
+    this.dialog.open(ImagePreviewComponent, {
+      data: {
+        base64String,
+        isPasted: true
+      }
+    }).closed.subscribe((res) => {
+      if (res === 'send') {
+        this.sendBase64Message(base64String);
+      }
     });
   }
 
