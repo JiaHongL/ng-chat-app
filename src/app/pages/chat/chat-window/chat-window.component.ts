@@ -143,12 +143,12 @@ import { Dialog } from '@angular/cdk/dialog';
                         }@else if(message?.replyToMessage?.message?.includes('data:image')){
                           <div class="flex justify-center items-center">
                             <div class="text-white mr-2">{{ message.replyToMessage.sender }}</div>
-                            <img class="max-w-[60px] max-h-[60px] m-1 rounded-lg" [src]="message?.replyToMessage?.message" alt="Image">
+                            <img class="max-w-[60px] max-h-[60px] mt-1 rounded-lg" [src]="message?.replyToMessage?.message" alt="Image">
                           </div>
                         }@else {
                           <div class="flex flex-col">
                             <div class="text-white">{{ message.replyToMessage.sender }}</div>
-                            <div class="text-sm text-gray-200">{{message.replyToMessage.message | truncate:45}}
+                            <div class="text-sm text-gray-200 pr-2">{{message.replyToMessage.message | truncate:45}}
                             </div>
                           </div>
                         }
@@ -185,12 +185,12 @@ import { Dialog } from '@angular/cdk/dialog';
                       }@else if(message?.replyToMessage?.message?.includes('data:image')){
                         <div class="flex justify-center items-center">
                           <div class="text-white mr-2">{{ message.replyToMessage?.sender }}</div>
-                          <img class="max-w-[60px] max-h-[60px] m-1 rounded-lg" [src]="message.replyToMessage?.message" alt="Image">
+                          <img class="max-w-[60px] max-h-[60px] mt-1 rounded-lg" [src]="message.replyToMessage?.message" alt="Image">
                         </div>
                       }@else {
                         <div class="flex flex-col">
                           <div class="text-white">{{ message?.replyToMessage?.sender }}</div>
-                          <div class="text-sm text-gray-200">{{message.replyToMessage?.message ?? '' | truncate:45}}
+                          <div class="text-sm text-gray-200 pr-2">{{message.replyToMessage?.message ?? '' | truncate:45}}
                           </div>
                         </div>
                       }
@@ -240,32 +240,32 @@ import { Dialog } from '@angular/cdk/dialog';
                       @if(message.replyToMessage){
                         <div
                           (click)="scrollToMessage(message?.replyToMessage?.id)" 
-                          class="cursor-pointer mr-1 pb-1  flex bg-gray-200 rounded-t-lg whitespace-pre-wrap border-y border-b-slate-300"
+                          class="cursor-pointer  pb-1  flex bg-gray-200 rounded-t-lg whitespace-pre-wrap border-y border-b-slate-300"
                         >
                           <div class="flex shrink-0 items-center">
                             <img class="w-6 h-6 rounded-full mx-2 bg-white" src="https://api.dicebear.com/8.x/pixel-art/svg?seed={{message?.replyToMessage?.sender}}" alt="Profile Image">
                           </div>
                           @if (message?.replyToMessage?.isRecalled){
                             <div class="flex flex-col">
-                              <div class="mr-2 text-black">{{ message.replyToMessage.sender }}</div>
+                              <div class=" text-black">{{ message.replyToMessage.sender }}</div>
                               <div class="text-sm text-gray-400 italic">Message recalled</div>
                             </div>
                           }@else if(message?.replyToMessage?.message?.includes('data:image')){
                             <div class="flex justify-center items-center">
-                              <div class="mr-2 text-black">{{ message.replyToMessage.sender }}</div>
-                              <img class="max-w-[60px] max-h-[60px] m-1 rounded-lg" [src]="message?.replyToMessage?.message" alt="Image">
+                              <div class=" text-black">{{ message.replyToMessage.sender }}</div>
+                              <img class="max-w-[60px] max-h-[60px] mt-1 rounded-lg" [src]="message?.replyToMessage?.message" alt="Image">
                             </div>
                           }@else {
                             <div class="flex flex-col">
                               <div class="text-black">{{ message.replyToMessage.sender }}</div>
-                              <div class="text-sm text-gray-400">{{message.replyToMessage.message | truncate:45}}
+                              <div class="text-sm text-gray-400 pr-2">{{message.replyToMessage.message | truncate:45}}
                               </div>
                             </div>
                           }
                         </div>
                       }
                       <div 
-                        class="mr-1 bg-gray-200 p-2 rounded-b-lg"
+                        class=" bg-gray-200 p-2 rounded-b-lg"
                         [ngClass]="{'rounded-t-lg': !message?.replyToMessage}" 
                       >
                         <img
@@ -295,12 +295,12 @@ import { Dialog } from '@angular/cdk/dialog';
                           }@else if(message?.replyToMessage?.message?.includes('data:image')){
                             <div class="flex justify-center items-center">
                               <div class="mr-2 text-black">{{ message.replyToMessage?.sender }}</div>
-                              <img class="max-w-[60px] max-h-[60px] m-1 rounded-lg" [src]="message.replyToMessage?.message" alt="Image">
+                              <img class="max-w-[60px] max-h-[60px] mt-1 rounded-lg" [src]="message.replyToMessage?.message" alt="Image">
                             </div>
                           }@else {
                             <div class="flex flex-col">
                               <div class="text-black">{{ message?.replyToMessage?.sender }}</div>
-                              <div class="text-sm text-gray-400">{{message.replyToMessage?.message ?? '' | truncate:45}}
+                              <div class="text-sm text-gray-400 pr-2">{{message.replyToMessage?.message ?? '' | truncate:45}}
                               </div>
                             </div>
                           }
@@ -313,7 +313,7 @@ import { Dialog } from '@angular/cdk/dialog';
                       ></div>
                     </div>
                   }
-                  <div class="self-end text-left text-xs text-gray-500 mt-1">{{ message.date | date: 'HH:mm' }}</div>
+                  <div class="ml-1 self-end text-left text-xs text-gray-500 mt-1">{{ message.date | date: 'HH:mm' }}</div>
                 </div>
               </div>
               <app-more-options-button 
