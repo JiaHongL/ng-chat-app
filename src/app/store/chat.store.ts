@@ -1,7 +1,8 @@
 // chat.store.ts
-import { inject, computed } from '@angular/core';
-import { signalStore, withState, withMethods, patchState, withComputed, getState } from '@ngrx/signals';
+import { inject, computed, effect } from '@angular/core';
+import { signalStore, withState, withMethods, patchState, withComputed, getState, withHooks } from '@ngrx/signals';
 import { User, ChatState, initialState, UserInfo, PrivateMessage, RoomMessage, GeneralMessage } from './models';
+import { withDevtools } from '@angular-architects/ngrx-toolkit';
 
 import { environment } from '../../environments/environment';
 
@@ -12,6 +13,7 @@ import { firstValueFrom } from 'rxjs';
 
 export const ChatStore = signalStore(
   { providedIn: 'root' },
+  withDevtools('ng-chat-app'),
   withState<ChatState>(initialState),
   withAutoScroll(),
   withComputed((store) => ({
@@ -369,5 +371,17 @@ export const ChatStore = signalStore(
       recallMessage,
       undoRecallMessage,
     };
+  }),
+  withHooks({
+    onInit(store) {
+      console.log('Store initialized',getState(store));
+      // effect(() => {
+        // const chatStore = getState(store);
+        // console.log('ChatStore updated', chatStore);
+      // });
+    },
+    onDestroy(store) {
+      // console.log('Store destroyed');
+    },
   })
 );
