@@ -372,7 +372,7 @@ import { Dialog } from '@angular/cdk/dialog';
     </div>
     <!-- reply message -->
     @if(selectedMessage()){
-      <div class="absolute h-[60px] top-[-60px] left-0 flex bg-slate-200 w-full p-2">
+      <div class="absolute h-[60px] top-[-60px] left-0 flex bg-slate-50 w-full p-2">
         <div class="flex shrink-0 items-center">
           <img class="w-10 h-10 rounded-full mr-2 bg-white" src="https://api.dicebear.com/8.x/pixel-art/svg?seed={{selectedMessage()?.sender}}" alt="Profile Image">
         </div>
@@ -390,9 +390,9 @@ import { Dialog } from '@angular/cdk/dialog';
             <div class="flex">
               <div class="leading-[60px] mr-2 text-base font-semibold">{{ selectedMessage()?.sender }}</div>
               <!-- 圖片 -->
-              <div class="rounded-lg">
+              <div class="rounded-lg flex-shrink-0">
                 <img
-                  class="max-w-[60px] max-h-[60px] ml-auto rounded-lg ml-1" 
+                  class="rounded-lg object-contain h-[44px] w-[44px] mt-2" 
                   [src]="selectedMessage()?.message" 
                   alt="Image"
                 >
