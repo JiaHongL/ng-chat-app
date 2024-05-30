@@ -952,16 +952,16 @@ var OperatorSubscriber = class extends Subscriber {
 // node_modules/rxjs/dist/esm/internal/operators/refCount.js
 function refCount() {
   return operate((source, subscriber) => {
-    let connection = null;
+    let connection2 = null;
     source._refCount++;
     const refCounter = createOperatorSubscriber(subscriber, void 0, void 0, void 0, () => {
       if (!source || source._refCount <= 0 || 0 < --source._refCount) {
-        connection = null;
+        connection2 = null;
         return;
       }
       const sharedConnection = source._connection;
-      const conn = connection;
-      connection = null;
+      const conn = connection2;
+      connection2 = null;
       if (sharedConnection && (!conn || sharedConnection === conn)) {
         sharedConnection.unsubscribe();
       }
@@ -969,7 +969,7 @@ function refCount() {
     });
     source.subscribe(refCounter);
     if (!refCounter.closed) {
-      connection = source.connect();
+      connection2 = source.connect();
     }
   });
 }
@@ -1004,23 +1004,23 @@ var ConnectableObservable = class extends Observable {
     _connection === null || _connection === void 0 ? void 0 : _connection.unsubscribe();
   }
   connect() {
-    let connection = this._connection;
-    if (!connection) {
-      connection = this._connection = new Subscription();
+    let connection2 = this._connection;
+    if (!connection2) {
+      connection2 = this._connection = new Subscription();
       const subject = this.getSubject();
-      connection.add(this.source.subscribe(createOperatorSubscriber(subject, void 0, () => {
+      connection2.add(this.source.subscribe(createOperatorSubscriber(subject, void 0, () => {
         this._teardown();
         subject.complete();
       }, (err) => {
         this._teardown();
         subject.error(err);
       }, () => this._teardown())));
-      if (connection.closed) {
+      if (connection2.closed) {
         this._connection = null;
-        connection = Subscription.EMPTY;
+        connection2 = Subscription.EMPTY;
       }
     }
-    return connection;
+    return connection2;
   }
   refCount() {
     return refCount()(this);
@@ -2618,7 +2618,7 @@ function scan(accumulator, seed) {
 function share(options = {}) {
   const { connector = () => new Subject(), resetOnError = true, resetOnComplete = true, resetOnRefCountZero = true } = options;
   return (wrapperSource) => {
-    let connection;
+    let connection2;
     let resetConnection;
     let subject;
     let refCount2 = 0;
@@ -2630,11 +2630,11 @@ function share(options = {}) {
     };
     const reset = () => {
       cancelReset();
-      connection = subject = void 0;
+      connection2 = subject = void 0;
       hasCompleted = hasErrored = false;
     };
     const resetAndUnsubscribe = () => {
-      const conn = connection;
+      const conn = connection2;
       reset();
       conn === null || conn === void 0 ? void 0 : conn.unsubscribe();
     };
@@ -2651,8 +2651,8 @@ function share(options = {}) {
         }
       });
       dest.subscribe(subscriber);
-      if (!connection && refCount2 > 0) {
-        connection = new SafeSubscriber({
+      if (!connection2 && refCount2 > 0) {
+        connection2 = new SafeSubscriber({
           next: (value) => dest.next(value),
           error: (err) => {
             hasErrored = true;
@@ -2667,7 +2667,7 @@ function share(options = {}) {
             dest.complete();
           }
         });
-        innerFrom(source).subscribe(connection);
+        innerFrom(source).subscribe(connection2);
       }
     })(wrapperSource);
   };
@@ -35208,6 +35208,30 @@ function withComputed(signalsFactory) {
     });
   };
 }
+function withHooks(hooksOrFactory) {
+  return (store2) => {
+    const storeProps = __spreadValues(__spreadValues(__spreadValues({
+      [STATE_SIGNAL]: store2[STATE_SIGNAL]
+    }, store2.slices), store2.signals), store2.methods);
+    const hooks = typeof hooksOrFactory === "function" ? hooksOrFactory(storeProps) : hooksOrFactory;
+    const createHook = (name) => {
+      const hook = hooks[name];
+      const currentHook = store2.hooks[name];
+      return hook ? () => {
+        if (currentHook) {
+          currentHook();
+        }
+        hook(storeProps);
+      } : currentHook;
+    };
+    return __spreadProps(__spreadValues({}, store2), {
+      hooks: {
+        onInit: createHook("onInit"),
+        onDestroy: createHook("onDestroy")
+      }
+    });
+  };
+}
 function withMethods(methodsFactory) {
   return (store2) => {
     const methods = methodsFactory(__spreadValues(__spreadValues(__spreadValues({
@@ -35256,6 +35280,146 @@ var initialState = {
   // 用於存儲各個聊天室的未讀訊息計數
 };
 
+// node_modules/@ngrx/signals/fesm2022/ngrx-signals-rxjs-interop.mjs
+function rxMethod(generator, config2) {
+  if (!config2?.injector) {
+    assertInInjectionContext(rxMethod);
+  }
+  const injector = config2?.injector ?? inject(Injector);
+  const destroyRef = injector.get(DestroyRef);
+  const source$ = new Subject();
+  const sourceSub = generator(source$).subscribe();
+  destroyRef.onDestroy(() => sourceSub.unsubscribe());
+  const rxMethodFn = (input2) => {
+    if (isSignal(input2)) {
+      const watcher = effect(() => {
+        const value = input2();
+        untracked(() => source$.next(value));
+      }, { injector });
+      const instanceSub = { unsubscribe: () => watcher.destroy() };
+      sourceSub.add(instanceSub);
+      return instanceSub;
+    }
+    if (isObservable(input2)) {
+      const instanceSub = input2.subscribe((value) => source$.next(value));
+      sourceSub.add(instanceSub);
+      return instanceSub;
+    }
+    source$.next(input2);
+    return { unsubscribe: noop };
+  };
+  rxMethodFn.unsubscribe = sourceSub.unsubscribe.bind(sourceSub);
+  return rxMethodFn;
+}
+
+// node_modules/@angular-architects/ngrx-toolkit/fesm2022/angular-architects-ngrx-toolkit.mjs
+var storeRegistry = signal({});
+var currentActionNames = /* @__PURE__ */ new Set();
+var synchronizationInitialized = false;
+function initSynchronization() {
+  effect(() => {
+    if (!connection) {
+      return;
+    }
+    const stores = storeRegistry();
+    const rootState = {};
+    for (const name in stores) {
+      const store2 = stores[name];
+      rootState[name] = store2();
+    }
+    const names = Array.from(currentActionNames);
+    const type = names.length ? names.join(", ") : "Store Update";
+    currentActionNames = /* @__PURE__ */ new Set();
+    connection.send({
+      type
+    }, rootState);
+  });
+}
+function getValueFromSymbol(obj, symbol) {
+  if (typeof obj === "object" && obj && symbol in obj) {
+    return obj[symbol];
+  }
+}
+function getStoreSignal(store2) {
+  const [signalStateKey] = Object.getOwnPropertySymbols(store2);
+  if (!signalStateKey) {
+    throw new Error("Cannot find State Signal");
+  }
+  return getValueFromSymbol(store2, signalStateKey);
+}
+var connection;
+function withDevtools(name) {
+  return (store2) => {
+    const isServer = isPlatformServer(inject(PLATFORM_ID));
+    if (isServer) {
+      return store2;
+    }
+    const extensions = window.__REDUX_DEVTOOLS_EXTENSION__;
+    if (!extensions) {
+      return store2;
+    }
+    if (!connection) {
+      connection = extensions.connect({
+        name: "NgRx Signal Store"
+      });
+    }
+    const storeSignal = getStoreSignal(store2);
+    storeRegistry.update((value) => __spreadProps(__spreadValues({}, value), {
+      [name]: storeSignal
+    }));
+    if (!synchronizationInitialized) {
+      initSynchronization();
+      synchronizationInitialized = true;
+    }
+    return store2;
+  };
+}
+function isUnsubscribable(fn) {
+  return !!fn?.unsubscribe;
+}
+var _SignalReduxStore = class _SignalReduxStore {
+  constructor() {
+    this.mapperDict = {};
+    this.dispatch = rxMethod(pipe(tap((action) => {
+      const callbacks = this.mapperDict[action.type];
+      if (callbacks?.storeMethod) {
+        if (isUnsubscribable(callbacks.storeMethod) && callbacks.resultMethod) {
+          return callbacks.storeMethod(action, (a) => {
+            const resultAction = callbacks.resultMethod?.(a);
+            this.dispatch(resultAction);
+          });
+        }
+        return callbacks?.storeMethod(action);
+      }
+      return;
+    })));
+  }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  connectFeatureStore(mappers) {
+    mappers.forEach((mapper) => mapper.types.forEach((action) => this.mapperDict[action] = {
+      storeMethod: mapper.storeMethod,
+      resultMethod: mapper.resultMethod
+    }));
+  }
+};
+_SignalReduxStore.\u0275fac = function SignalReduxStore_Factory(t) {
+  return new (t || _SignalReduxStore)();
+};
+_SignalReduxStore.\u0275prov = /* @__PURE__ */ \u0275\u0275defineInjectable({
+  token: _SignalReduxStore,
+  factory: _SignalReduxStore.\u0275fac,
+  providedIn: "root"
+});
+var SignalReduxStore = _SignalReduxStore;
+(() => {
+  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(SignalReduxStore, [{
+    type: Injectable,
+    args: [{
+      providedIn: "root"
+    }]
+  }], null, null);
+})();
+
 // src/app/store/auto-scroll.feature.ts
 function withAutoScroll() {
   return signalStoreFeature(withState({ autoScroll: true }), withComputed(({ autoScroll }) => ({
@@ -35277,7 +35441,7 @@ function withAutoScroll() {
 }
 
 // src/app/store/chat.store.ts
-var ChatStore = signalStore({ providedIn: "root" }, withState(initialState), withAutoScroll(), withComputed((store2) => ({
+var ChatStore = signalStore({ providedIn: "root" }, withDevtools("ng-chat-app"), withState(initialState), withAutoScroll(), withComputed((store2) => ({
   currentChatPartner: computed(() => {
     const currentRoom = store2.currentRoom();
     if (currentRoom.startsWith("private_")) {
@@ -35598,6 +35762,12 @@ var ChatStore = signalStore({ providedIn: "root" }, withState(initialState), wit
     recallMessage,
     undoRecallMessage
   };
+}), withHooks({
+  onInit(store2) {
+    console.log("Store initialized", getState(store2));
+  },
+  onDestroy(store2) {
+  }
 }));
 
 // src/app/services/user.service.ts
