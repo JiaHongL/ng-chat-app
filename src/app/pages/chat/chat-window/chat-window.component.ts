@@ -61,7 +61,9 @@ import { Dialog } from '@angular/cdk/dialog';
     <div>
       <div class="flex items-center font-semibold">
         <div class="mr-1 text-xl max-w-[250px] sm:max-w-[350px] text-nowrap overflow-hidden text-ellipsis">
-          {{  store.currentChatPartner()?.username }}
+          {{  
+            store.currentChatPartner()?.username === 'general' ? 'General' : store.currentChatPartner()?.username
+          }}
         </div>
         @if(store.currentChatPartner()?.username === 'general'){
           <span class="text-sm text-gray-500">

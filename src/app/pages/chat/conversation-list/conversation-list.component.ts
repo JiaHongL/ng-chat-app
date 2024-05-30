@@ -51,7 +51,7 @@ import { UserService } from './../../../services/user.service';
 					<div class="flex-grow overflow-hidden">
 							<div>
 									<div class="font-semibold">
-										general
+										General
 										<span class="text-sm text-gray-500">
 											({{ store.users().length }})
 										</span>
