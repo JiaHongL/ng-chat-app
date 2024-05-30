@@ -26,7 +26,7 @@ https://chat-app-backend-9ma9.onrender.com/#/login
 
 ### 大廳
 
-![截圖 2024-05-31 凌晨3.15.25](https://hackmd.io/_uploads/Byn7mILVA.png)
+![image](https://hackmd.io/_uploads/Byu2vULER.png)
 
 ### 私訊
 
