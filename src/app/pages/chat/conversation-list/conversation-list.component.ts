@@ -1,6 +1,8 @@
 import { CommonModule, DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, HostBinding, inject } from '@angular/core';
 
+import { environment } from './../../../../environments/environment';
+
 import { ChatStore } from '../../../store/chat.store';
 
 import { SafeHtmlPipe } from '../../../shared/pipes/safe-html.pipe';
@@ -23,7 +25,7 @@ import { UserService } from './../../../services/user.service';
 	<!-- 個人資訊 -->
 	<div class="hidden sm:flex items-center mb-4">
 		@if(store.userInfo()?.username){
-			<img class="w-10 h-10 rounded-full mr-2 bg-white" src="https://api.dicebear.com/8.x/pixel-art/svg?seed={{ store.userInfo()?.username }}" alt="Profile Image">
+			<img class="w-10 h-10 rounded-full mr-2 bg-white" src="{{environment.profileImageApi}}{{ store.userInfo()?.username }}" alt="Profile Image">
 			<span class="font-semibold text-xl text-gray-900 max-w-[110px] text-nowrap overflow-hidden text-ellipsis">{{ store.userInfo()?.username }}</span>
 		}
 		<button 
@@ -95,7 +97,7 @@ import { UserService } from './../../../services/user.service';
 								}"
 							>
 									<div class="relative flex-shrink-0 flex-grow-0">
-										<img class="w-10 h-10 rounded-full mr-2" src="https://api.dicebear.com/8.x/pixel-art/svg?seed={{user.username }}" alt="Profile Image">
+										<img class="w-10 h-10 rounded-full mr-2" src="{{environment.profileImageApi}}{{user.username }}" alt="Profile Image">
 										@if(user.status === 'online'){
 											<span class="absolute bottom-0 right-3 bg-green-600 w-2 h-2 rounded-full"></span>
 										} @else{
@@ -134,6 +136,7 @@ import { UserService } from './../../../services/user.service';
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ConversationListComponent {
+	environment = environment;
 	@HostBinding('class') className = 'z-10 overflow-scroll custom-scrollbar inline-block w-screen h-screen sm:h-auto p-4 sm:max-w-[250px] sm:min-w-[250px] bg-gray-100 sm:p-4 sm:w-100 sm:h-100';
 	store = inject(ChatStore);
 	userService = inject(UserService);

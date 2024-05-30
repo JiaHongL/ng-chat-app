@@ -1,6 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, HostBinding, inject } from '@angular/core';
 
+import { environment } from './../../../../environments/environment';
+
 import { ChatStore } from '../../../store/chat.store';
 import { ViewService } from '../../../services/view.service';
 
@@ -27,7 +29,7 @@ import { ViewService } from '../../../services/view.service';
 						>
 								<img
 								class="w-10 h-10 rounded-full mr-2"
-								src="https://api.dicebear.com/8.x/pixel-art/svg?seed={{user.username}}"
+								src="{{environment.profileImageApi}}{{user.username}}"
 								alt="Profile Image"
 								/>
 								<div>
@@ -54,7 +56,7 @@ import { ViewService } from '../../../services/view.service';
 						>
 								<img
 								class="w-10 h-10 rounded-full mr-2"
-								src="https://api.dicebear.com/8.x/pixel-art/svg?seed={{user.username}}"
+								src="{{environment.profileImageApi}}{{user.username}}"
 								alt="Profile Image"
 								/>
 								<div>
@@ -69,6 +71,7 @@ import { ViewService } from '../../../services/view.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UserStatusListComponent {
+	environment = environment;
   @HostBinding('class') class = 'h-screen sm:pb-0 sm:h-auto min-w-[200px] w-100 bg-gray-100 p-4 flex flex-nowrap flex-col';
   store = inject(ChatStore);
   viewService = inject(ViewService);

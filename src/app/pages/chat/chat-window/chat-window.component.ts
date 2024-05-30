@@ -2,6 +2,8 @@ import { ChangeDetectionStrategy, Component, ElementRef, HostBinding, computed, 
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
+import { environment } from './../../../../environments/environment';
+
 import { ViewService } from '../../../services/view.service';
 import { ChatStore } from '../../../store/chat.store';
 
@@ -135,7 +137,7 @@ import { Dialog } from '@angular/cdk/dialog';
                         class="cursor-pointer ml-1 pb-1  flex bg-blue-500 rounded-t-lg text-white whitespace-pre-wrap border-y border-b-slate-300"
                       >
                         <div class="flex shrink-0 items-center">
-                          <img class="w-6 h-6 rounded-full mx-2 bg-white" src="https://api.dicebear.com/8.x/pixel-art/svg?seed={{message?.replyToMessage?.sender}}" alt="Profile Image">
+                          <img class="w-6 h-6 rounded-full mx-2 bg-white" src="{{environment.profileImageApi}}{{message?.replyToMessage?.sender}}" alt="Profile Image">
                         </div>
                         @if (message?.replyToMessage?.isRecalled){
                           <div class="flex flex-col">
@@ -177,7 +179,7 @@ import { Dialog } from '@angular/cdk/dialog';
                       class="cursor-pointer ml-1 pb-1  flex bg-blue-500 rounded-t-lg text-white whitespace-pre-wrap border-y border-b-slate-300"
                     >
                       <div class="flex shrink-0 items-center">
-                        <img class="w-6 h-6 rounded-full mx-2 bg-white" src="https://api.dicebear.com/8.x/pixel-art/svg?seed={{message.replyToMessage?.sender}}" alt="Profile Image">
+                        <img class="w-6 h-6 rounded-full mx-2 bg-white" src="{{environment.profileImageApi}}{{message.replyToMessage?.sender}}" alt="Profile Image">
                       </div>
                       @if (message?.replyToMessage?.isRecalled){
                           <div class="flex flex-col">
@@ -217,7 +219,7 @@ import { Dialog } from '@angular/cdk/dialog';
             <!-- 收回 -->
             @if(store.currentChatPartner()?.username === 'general'){
               <div class="flex items-center mb-2">
-                <img class="w-6 h-6 rounded-full mr-2" src="https://api.dicebear.com/8.x/pixel-art/svg?seed={{message.sender}}" alt="Profile Image">
+                <img class="w-6 h-6 rounded-full mr-2" src="{{environment.profileImageApi}}{{message.sender}}" alt="Profile Image">
                 <div class="text-sm font-semibold">{{ message.sender }}</div>
               </div>
             }
@@ -232,7 +234,7 @@ import { Dialog } from '@angular/cdk/dialog';
               <div>
                 <!-- 對方的頭像加文字 -->
                 <div class="flex items-center mb-2">
-                  <img class="w-6 h-6 rounded-full mr-2" src="https://api.dicebear.com/8.x/pixel-art/svg?seed={{message.sender}}" alt="Profile Image">
+                  <img class="w-6 h-6 rounded-full mr-2" src="{{environment.profileImageApi}}{{message.sender}}" alt="Profile Image">
                   <div class="text-sm font-semibold">{{ message.sender }}</div>
                 </div>
                 <div class="flex">
@@ -245,7 +247,7 @@ import { Dialog } from '@angular/cdk/dialog';
                           class="cursor-pointer  pb-1  flex bg-gray-200 rounded-t-lg whitespace-pre-wrap border-y border-b-slate-300"
                         >
                           <div class="flex shrink-0 items-center">
-                            <img class="w-6 h-6 rounded-full mx-2 bg-white" src="https://api.dicebear.com/8.x/pixel-art/svg?seed={{message?.replyToMessage?.sender}}" alt="Profile Image">
+                            <img class="w-6 h-6 rounded-full mx-2 bg-white" src="{{environment.profileImageApi}}{{message?.replyToMessage?.sender}}" alt="Profile Image">
                           </div>
                           @if (message?.replyToMessage?.isRecalled){
                             <div class="flex flex-col">
@@ -287,7 +289,7 @@ import { Dialog } from '@angular/cdk/dialog';
                           class="cursor-pointer pb-1  flex bg-gray-200 rounded-t-lg  whitespace-pre-wrap border-y border-b-slate-300"
                         >
                           <div class="flex shrink-0 items-center">
-                            <img class="w-6 h-6 rounded-full mx-2 bg-white" src="https://api.dicebear.com/8.x/pixel-art/svg?seed={{message.replyToMessage?.sender}}" alt="Profile Image">
+                            <img class="w-6 h-6 rounded-full mx-2 bg-white" src="{{environment.profileImageApi}}{{message.replyToMessage?.sender}}" alt="Profile Image">
                           </div>
                           @if (message?.replyToMessage?.isRecalled){
                               <div class="flex flex-col">
@@ -376,7 +378,7 @@ import { Dialog } from '@angular/cdk/dialog';
     @if(selectedMessage()){
       <div class="absolute h-[60px] top-[-60px] left-0 flex bg-slate-50 w-full p-2">
         <div class="flex shrink-0 items-center">
-          <img class="w-10 h-10 rounded-full mr-2 bg-white" src="https://api.dicebear.com/8.x/pixel-art/svg?seed={{selectedMessage()?.sender}}" alt="Profile Image">
+          <img class="w-10 h-10 rounded-full mr-2 bg-white" src="{{environment.profileImageApi}}{{selectedMessage()?.sender}}" alt="Profile Image">
         </div>
         <div class="flex flex-col justify-center overflow-hidden">
           @if(!selectedMessage()?.message?.includes('data:image')){
@@ -423,6 +425,7 @@ import { Dialog } from '@angular/cdk/dialog';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ChatWindowComponent {
+  environment = environment;
   @HostListener('window:click', ['$event'])
   onWindowClick(event: Event) {
     this.openDropdownIndex.set(-1);
@@ -477,7 +480,7 @@ export class ChatWindowComponent {
     if (partner?.username === 'general') {
       return 'https://api.dicebear.com/8.x/initials/svg?seed=General';
     } else {
-      return `https://api.dicebear.com/8.x/pixel-art/svg?seed=${this.store.currentChatPartner()?.username}`;
+      return `{{environment.profileImageApi}}${this.store.currentChatPartner()?.username}`;
     }
   });
 
