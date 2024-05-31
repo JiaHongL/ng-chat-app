@@ -7,7 +7,9 @@ import { withDevtools } from '@angular-architects/ngrx-toolkit';
 import { environment } from '../../environments/environment';
 
 import { UserService } from '../services/user.service';
+
 import { withAutoScroll } from './auto-scroll.feature';
+import { withPageVisibility } from './page-visibility.feature';
 
 import { firstValueFrom } from 'rxjs';
 
@@ -16,6 +18,7 @@ export const ChatStore = signalStore(
   withDevtools('ng-chat-app'),
   withState<ChatState>(initialState),
   withAutoScroll(),
+  withPageVisibility(),
   withComputed((store) => ({
     currentChatPartner: computed(() => {
       const currentRoom = store.currentRoom();
@@ -385,3 +388,8 @@ export const ChatStore = signalStore(
     },
   })
 );
+
+
+
+
+

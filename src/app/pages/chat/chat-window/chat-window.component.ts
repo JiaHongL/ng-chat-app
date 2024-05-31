@@ -523,7 +523,14 @@ export class ChatWindowComponent {
     const isMobile = this.viewService.isMobile();
     const usageContext = this.usageContext();
     const currentChatPartnerUsername = this.store.currentChatPartner()?.username as string;
+    const isPageVisible = this.store.isPageVisible();
 
+    // 如果當前頁面不可見，就不標記已讀
+    if (!isPageVisible) {
+      return;
+    }
+
+    // 如果沒選擇聊天對象，就不標記已讀
     if (!currentChatPartnerUsername) {
       return;
     }
