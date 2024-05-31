@@ -35440,8 +35440,25 @@ function withAutoScroll() {
   })));
 }
 
+// src/app/store/page-visibility.feature.ts
+function withPageVisibility() {
+  return signalStoreFeature(withState({ isPageVisible: !document.hidden }), withHooks((store2) => {
+    function handleVisibilityChange() {
+      patchState(store2, { isPageVisible: !document.hidden });
+    }
+    return {
+      onInit() {
+        document.addEventListener("visibilitychange", handleVisibilityChange);
+      },
+      onDestroy() {
+        document.removeEventListener("visibilitychange", handleVisibilityChange);
+      }
+    };
+  }));
+}
+
 // src/app/store/chat.store.ts
-var ChatStore = signalStore({ providedIn: "root" }, withDevtools("ng-chat-app"), withState(initialState), withAutoScroll(), withComputed((store2) => ({
+var ChatStore = signalStore({ providedIn: "root" }, withDevtools("ng-chat-app"), withState(initialState), withAutoScroll(), withPageVisibility(), withComputed((store2) => ({
   currentChatPartner: computed(() => {
     const currentRoom = store2.currentRoom();
     if (currentRoom.startsWith("private_")) {
@@ -72256,6 +72273,10 @@ var _ChatWindowComponent = class _ChatWindowComponent {
       const isMobile = this.viewService.isMobile();
       const usageContext = this.usageContext();
       const currentChatPartnerUsername = this.store.currentChatPartner()?.username;
+      const isPageVisible = this.store.isPageVisible();
+      if (!isPageVisible) {
+        return;
+      }
       if (!currentChatPartnerUsername) {
         return;
       }
