@@ -508,9 +508,6 @@ body {
 .h-4 {
   height: 1rem;
 }
-.h-4\/5 {
-  height: 80%;
-}
 .h-5 {
   height: 1.25rem;
 }
@@ -525,6 +522,9 @@ body {
 }
 .h-\[60px\] {
   height: 60px;
+}
+.h-\[85\%\] {
+  height: 85%;
 }
 .h-full {
   height: 100%;
@@ -576,6 +576,9 @@ body {
 }
 .w-\[44px\] {
   width: 44px;
+}
+.w-\[80\%\] {
+  width: 80%;
 }
 .w-full {
   width: 100%;
