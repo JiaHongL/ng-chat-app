@@ -31,7 +31,7 @@ import { Subject, interval, map, startWith, takeUntil, tap } from 'rxjs';
       class="font-sans bg-gray-200 h-screen min-w-[700px]  flex items-center justify-center"
       [ngClass]="{'animate-pulse': !store.isSocketStable()}"
     >
-      <div class="flex w-4/5 h-4/5 min-w-[700px] bg-white rounded-lg shadow-lg">
+      <div class="flex w-[80%] h-[85%] min-w-[700px] bg-white rounded-lg shadow-lg">
           <!-- Sidebar -->
           <app-conversation-list />
           <!-- Chat area -->
