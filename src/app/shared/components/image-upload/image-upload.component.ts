@@ -29,7 +29,7 @@ import { ChatStore } from '../../../store/chat.store';
     </div>
     @if(this.base64String){
       <div class="z-40 fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center">
-        <div class="bg-white p-8 rounded-lg shadow-lg max-w-[550px] max-h-[550px] sm:max-w-[800px] sm:max-h-[800px]">
+        <div class="bg-white p-8 rounded-lg shadow-lg max-w-[550px] max-h-[550px] sm:max-w-[800px] sm:max-h-[550px]">
           <div class="flex justify-between items-center mb-6">
             <img *ngIf="base64String" [src]="base64String" class="max-w-[450px] max-h-[450px] sm:max-w-[700px] sm:max-h-[700] mx-auto" />
           </div>
