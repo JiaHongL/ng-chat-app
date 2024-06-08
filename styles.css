@@ -1533,14 +1533,14 @@ body {
   .sm\:max-h-73 {
     max-height: 73%;
   }
+  .sm\:max-h-\[550\] {
+    max-height: 550;
+  }
+  .sm\:max-h-\[550px\] {
+    max-height: 550px;
+  }
   .sm\:max-h-\[700\] {
     max-height: 700;
-  }
-  .sm\:max-h-\[800\] {
-    max-height: 800;
-  }
-  .sm\:max-h-\[800px\] {
-    max-height: 800px;
   }
   .sm\:max-h-\[900px\] {
     max-height: 900px;
