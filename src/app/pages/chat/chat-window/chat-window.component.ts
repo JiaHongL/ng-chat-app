@@ -136,7 +136,7 @@ import { Dialog } from '@angular/cdk/dialog';
                   @if(message.replyToMessage){
                       <div 
                         (click)="scrollToMessage(message?.replyToMessage?.id)" 
-                        class="cursor-pointer ml-1 pb-1  flex bg-blue-500 rounded-t-lg text-white whitespace-pre-wrap border-y border-b-slate-300"
+                        class="cursor-pointer ml-1 pb-1  flex bg-blue-500 rounded-t-lg text-white whitespace-pre-wrap break-all border-y border-b-slate-300"
                       >
                         <div class="flex shrink-0 items-center">
                           <img class="w-6 h-6 rounded-full mx-2 bg-white" src="{{environment.profileImageApi}}{{message?.replyToMessage?.sender}}" alt="Profile Image">
@@ -178,7 +178,7 @@ import { Dialog } from '@angular/cdk/dialog';
                   @if(message?.replyToMessage){
                     <div 
                       (click)="scrollToMessage(message.replyToMessage?.id)" 
-                      class="cursor-pointer ml-1 pb-1  flex bg-blue-500 rounded-t-lg text-white whitespace-pre-wrap border-y border-b-slate-300"
+                      class="cursor-pointer ml-1 pb-1  flex bg-blue-500 rounded-t-lg text-white whitespace-pre-wrap break-all border-y border-b-slate-300"
                     >
                       <div class="flex shrink-0 items-center">
                         <img class="w-6 h-6 rounded-full mx-2 bg-white" src="{{environment.profileImageApi}}{{message.replyToMessage?.sender}}" alt="Profile Image">
@@ -203,7 +203,7 @@ import { Dialog } from '@angular/cdk/dialog';
                     </div>
                   }
                   <div 
-                    class="ml-1 bg-blue-500 text-white rounded-b-lg p-2 whitespace-pre-wrap"
+                    class="ml-1 bg-blue-500 text-white rounded-b-lg p-2 whitespace-pre-wrap break-all"
                     [ngClass]="{'rounded-t-lg': !message.replyToMessage}" 
                     [innerHTML]="message.message"
                   ></div>
@@ -246,7 +246,7 @@ import { Dialog } from '@angular/cdk/dialog';
                       @if(message.replyToMessage){
                         <div
                           (click)="scrollToMessage(message?.replyToMessage?.id)" 
-                          class="cursor-pointer  pb-1  flex bg-gray-200 rounded-t-lg whitespace-pre-wrap border-y border-b-slate-300"
+                          class="cursor-pointer  pb-1  flex bg-gray-200 rounded-t-lg whitespace-pre-wrap break-all border-y border-b-slate-300"
                         >
                           <div class="flex shrink-0 items-center">
                             <img class="w-6 h-6 rounded-full mx-2 bg-white" src="{{environment.profileImageApi}}{{message?.replyToMessage?.sender}}" alt="Profile Image">
@@ -288,7 +288,7 @@ import { Dialog } from '@angular/cdk/dialog';
                       @if(message?.replyToMessage){
                         <div
                           (click)="scrollToMessage(message.replyToMessage?.id)"
-                          class="cursor-pointer pb-1  flex bg-gray-200 rounded-t-lg  whitespace-pre-wrap border-y border-b-slate-300"
+                          class="cursor-pointer pb-1  flex bg-gray-200 rounded-t-lg  whitespace-pre-wrap break-all border-y border-b-slate-300"
                         >
                           <div class="flex shrink-0 items-center">
                             <img class="w-6 h-6 rounded-full mx-2 bg-white" src="{{environment.profileImageApi}}{{message.replyToMessage?.sender}}" alt="Profile Image">
@@ -313,7 +313,7 @@ import { Dialog } from '@angular/cdk/dialog';
                         </div>
                       }
                       <div 
-                        class="w-full bg-gray-200 p-2 rounded-b-lg whitespace-pre-wrap"
+                        class="w-full bg-gray-200 p-2 rounded-b-lg whitespace-pre-wrap break-all"
                         [ngClass]="{'rounded-t-lg': !message.replyToMessage}"  
                         [innerHTML]="message.message"
                       ></div>
