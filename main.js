@@ -35087,9 +35087,9 @@ var VERSION4 = new Version("17.3.9");
 
 // src/environments/environment.ts
 var environment = {
-  production: false,
-  apiUrl: "https://chat-app-backend-t7ug.onrender.com/api",
-  websocketUrl: "wss://chat-app-backend-t7ug.onrender.com",
+  production: true,
+  apiUrl: "https://chat-app-backend-9ma9.onrender.com/api",
+  websocketUrl: "wss://chat-app-backend-9ma9.onrender.com",
   profileImageApi: "https://api.dicebear.com/8.x/pixel-art/svg?seed=J_"
 };
 
